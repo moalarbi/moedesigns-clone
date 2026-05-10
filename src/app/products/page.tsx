@@ -200,6 +200,8 @@ function ProductCard({ type, price, title, img, href }: typeof products[0]) {
         transition: 'border-color 0.2s ease',
         boxSizing: 'border-box',
         flexShrink: 0,
+        /* Cards need explicit RTL since they sit inside a direction:ltr grid */
+        direction: 'rtl',
       }}
     >
       {/* ── Top row: dots (left) + type + cart (right) ── */}
