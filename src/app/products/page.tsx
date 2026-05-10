@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect, CSSProperties } from 'react';
+import { useState, useEffect, useRef, CSSProperties } from 'react';
 import Image from 'next/image';
 
 /* ═══════════════════════════════════════════════════
@@ -118,16 +118,47 @@ function GhostBtn({ children, href = '#', small = false }: {
 }
 
 /* ═══════════════════════════════════════════════════
+   DROPDOWN ITEM
+═══════════════════════════════════════════════════ */
+function DropItem({ label, href, icon }: { label: string; href: string; icon?: string }) {
+  const [hov, setHov] = useState(false);
+  return (
+    <a href={href} onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
+      style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        padding: '9px 14px', textDecoration: 'none',
+        background: hov ? 'rgba(255,255,255,0.05)' : 'transparent',
+        color: hov ? C.text1 : C.text2, fontSize: 13,
+        transition: 'background 0.15s, color 0.15s', direction: 'rtl',
+      }}>
+      <span>{label}</span>
+      {icon && <span style={{ fontSize: 14, opacity: 0.7 }}>{icon}</span>}
+    </a>
+  );
+}
+
+/* ═══════════════════════════════════════════════════
    NAVBAR
 ═══════════════════════════════════════════════════ */
 function NavbarInner() {
   const [scrolled, setScrolled] = useState(false);
+  const [dropOpen, setDropOpen] = useState(false);
+  const dotsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fn = () => setScrolled(window.scrollY > 20);
     window.addEventListener('scroll', fn, { passive: true });
     return () => window.removeEventListener('scroll', fn);
   }, []);
+
+  useEffect(() => {
+    if (!dropOpen) return;
+    const handler = (e: MouseEvent) => {
+      if (dotsRef.current && !dotsRef.current.contains(e.target as Node)) setDropOpen(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [dropOpen]);
 
   return (
     <nav style={{
@@ -169,7 +200,26 @@ function NavbarInner() {
               </a>
             );
           })}
-          <Dots size={11} />
+          <div ref={dotsRef} style={{ position: 'relative' }}>
+            <span onClick={() => setDropOpen(p => !p)}
+              style={{ fontSize: 11, letterSpacing: '3px', color: dropOpen ? C.text2 : C.text3, cursor: 'pointer', userSelect: 'none' as const, lineHeight: 1 }}>
+              ···
+            </span>
+            {dropOpen && (
+              <div style={{
+                position: 'absolute', top: 'calc(100% + 12px)', right: 0,
+                width: 190, background: C.surface,
+                border: `1px solid ${C.border}`, borderRadius: 10,
+                boxShadow: '0 8px 24px rgba(0,0,0,0.5)', overflow: 'hidden', zIndex: 300,
+              }}>
+                <DropItem label="مصادر مجّانيّة" href="/freebies" />
+                <DropItem label="البودكاست" href="/podcast" />
+                <DropItem label="التواصل" href="/contact" />
+                <div style={{ borderTop: `1px solid ${C.border}`, margin: '4px 0' }} />
+                <DropItem label="الوضع اللّيلي" href="#" icon="🌙" />
+              </div>
+            )}
+          </div>
         </div>
 
         {/* RTL left side: dots + CTA */}
