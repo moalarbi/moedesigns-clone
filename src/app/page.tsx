@@ -207,16 +207,21 @@ function Navbar() {
           </div>
 
           {/* Nav links */}
-          {['المنتجات', 'الخدمات', 'الأعمال', 'المقالات'].map(l => {
+          {[
+            { label: 'المنتجات', href: '/products' },
+            { label: 'الخدمات',  href: '#' },
+            { label: 'الأعمال',  href: '#' },
+            { label: 'المقالات', href: '#' },
+          ].map(({ label, href }) => {
             const [hov, setHov] = useState(false);
             return (
-              <a key={l} href="#"
+              <a key={label} href={href}
                 onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
                 style={{
                   fontSize: 16, color: hov ? C.text1 : C.text2,
                   textDecoration: 'none', transition: 'color 0.15s',
                 }}>
-                {l}
+                {label}
               </a>
             );
           })}
