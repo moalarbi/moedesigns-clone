@@ -3,7 +3,7 @@ import { useState, useEffect, CSSProperties } from 'react';
 import Image from 'next/image';
 
 /* ═══════════════════════════════════════════════════
-   DESIGN TOKENS  —  from moedesigns.io
+   DESIGN TOKENS
 ═══════════════════════════════════════════════════ */
 const C = {
   bg:          '#0f0f0f',
@@ -28,42 +28,45 @@ function wrap(extra: CSSProperties = {}): CSSProperties {
 /* ═══════════════════════════════════════════════════
    DATA
 ═══════════════════════════════════════════════════ */
-const products = [
-  {
-    type:  'دورة مسجّلة',
-    price: '$249',
-    title: 'المنهجيّة "العلميّة" في الكتابة الإعلانيّة',
-    img:   '/images/products/product-copywriting.png',
-    href:  '#',
-  },
-  {
-    type:  'دورة رقميّة مسجّلة',
-    price: '$199',
-    title: 'دورة تصميم وبناء المواقع',
-    img:   '/images/products/product-webdesign.png',
-    href:  '#',
-  },
-  {
-    type:  'كتيّب رقمي تفاعلي',
-    price: '$69',
-    title: 'كتيّب استراتيجيّة البراند الشخصي',
-    img:   '/images/products/product-brand.png',
-    href:  '#',
-  },
-  {
-    type:  'دورة مسجّلة',
-    price: '$199',
-    title: 'أساسيات بناء وتسويق الدورات الرقمية',
-    img:   '/images/products/product-courses.png',
-    href:  '#',
-  },
-  {
-    type:  'ورشة مسجّلة',
-    price: '$35',
-    title: 'ورشة الكتابة الإعلانيّة',
-    img:   '/images/products/product-workshop.png',
-    href:  '#',
-  },
+const categories = [
+  'البيع والتسعير',
+  'السوشال ميديا والإعلام',
+  'التسويق والتوسّع',
+  'الاستراتيجيّة والتمركز',
+  'بناء المشروع والمنتجات',
+];
+
+const articles = [
+  'منهجيّتي لبيع الخدمات الأغلى | Hight ticket',
+  '٤ قِيَم. كُل أصحاب البراندات الناجحة كانت عندهم',
+  'تقرير: هل ما زال بيع الدورات مشروع مُربح؟',
+  '٣ أسئلة قبل أن أبدأ بأي مشروع',
+  'درست حَملات أفضل من يبيعون المنتجات الرقميّة. اتّضح أن لديهم سر..',
+  'التخصّص يحميك من تحيّزاتك الفكريّة',
+  'لماذا أفضّل التخصّص في المُشكلة وليس في التكنيك (الحِرفة)؟',
+  '٤ تخصّصات استشاريّة ستحقق الملايين بحلول ٢٠٢٨',
+  'استراتيجيّتي لليوتيوب والمحتوى في ٢٠٢٦',
+  'قيمة أي مدرّب تنبع من ٤ نواحي',
+  'العميل لا يشتري منافع ولا مميّزات إنّما يشتري توكيلاً للمُخاطرة',
+  'هل تبني حاليّاً براند، أو مشروع إعادة توزيع؟',
+  'مشروع لايف ستايل أو شركة؟ أيّهم الأفضل؟',
+  'تحدّي توسّع مشروعك هو تحدي بناء الفريق',
+  'المرجع لكيف تستثمر في مشروعك في بيع الخبرات',
+  'أبسط صفحة هبوط لتبدأ في بيع الخدمات الاستشاريّة',
+  'مكالمة البيع التي ضاعفت حجم المشروع ٣ مرّات',
+  'فخ التعدّد: لماذا منتجات أكثر = إيرادات أقل',
+  'للخبراء: كيف تحول معرفتك إلى مبيعات مضمونة',
+  'الشفافيّة في تسعير الخدمات',
+  'تجنّب المنافسة بالسعر بعمل باقاتك الخاصّة',
+  'كيف تبني نظام لمحتوى السوشال ميديا في ٦ خطوات لتضاعف وصولك وبراندك الشخصي',
+  'الحالة الوحيدة ليكون "أسلوبك" ميزة تنافسيّة',
+  'كيف تبني مشروع أكبر منك',
+  'توسّع المشروع الاستشاري: ضع أهداف مستحيلة',
+  'لماذا التخطيط لا يعني الاستراتيجيّة ولا يعني النتائج',
+  'ماذا تستطيع أن تبيع في عصر تشات جي بي تي؟',
+  'القِيَم التي تُحدد نجاح المشروع الاستشاري',
+  'كيف تتوسّع المشاريع؟ (ولماذا يعلق البقيّة؟)',
+  'في المجال الإبداعي؟ هنا الطريقة لزيادة دخلك',
 ];
 
 /* ═══════════════════════════════════════════════════
@@ -78,20 +81,6 @@ function Dots({ size = 13 }: { size?: number }) {
   );
 }
 
-/* Shopping-bag icon */
-function CartIcon() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"
-      xmlns="http://www.w3.org/2000/svg">
-      <rect x="1.5" y="5" width="11" height="7.5" rx="1.5"
-        stroke="#888" strokeWidth="1.15" fill="none" />
-      <path d="M4.5 5V3.7a2.5 2.5 0 015 0V5"
-        stroke="#888" strokeWidth="1.15" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-/* Ghost / outline button */
 function GhostBtn({ children, href = '#', small = false }: {
   children: React.ReactNode; href?: string; small?: boolean;
 }) {
@@ -149,10 +138,10 @@ function NavbarInner() {
               style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           </a>
           {[
-            { label: 'المنتجات', href: '/products', active: true },
+            { label: 'المنتجات', href: '/products' },
             { label: 'الخدمات',  href: '/services' },
             { label: 'الأعمال',  href: '/works' },
-            { label: 'المقالات', href: '/blog' },
+            { label: 'المقالات', href: '/blog', active: true },
           ].map(({ label, href, active }) => {
             const [hov, setHov] = useState(false);
             return (
@@ -183,90 +172,14 @@ function NavbarInner() {
 }
 
 /* ═══════════════════════════════════════════════════
-   PRODUCT CARD
+   SEARCH ICON
 ═══════════════════════════════════════════════════ */
-function ProductCard({ type, price, title, img, href }: typeof products[0]) {
-  const [hov, setHov] = useState(false);
-
+function SearchIcon() {
   return (
-    <a href={href}
-      onMouseEnter={() => setHov(true)}
-      onMouseLeave={() => setHov(false)}
-      style={{
-        display: 'block',
-        width: 392, height: 332,
-        borderRadius: 12,
-        border: `1px solid ${hov ? C.borderHover : C.border}`,
-        padding: '12px 16px',
-        textDecoration: 'none',
-        transition: 'border-color 0.2s ease',
-        boxSizing: 'border-box',
-        flexShrink: 0,
-        /* Cards need explicit RTL since they sit inside a direction:ltr grid */
-        direction: 'rtl',
-      }}
-    >
-      {/* ── Top row: dots (left) + type + cart (right) ── */}
-      <div style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        height: 24,
-        marginBottom: 8,
-      }}>
-        {/* In RTL: first child = right side */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <CartIcon />
-          <span style={{ fontSize: 12, fontWeight: 500, color: C.text2 }}>{type}</span>
-        </div>
-        {/* Second child = left side in RTL */}
-        <Dots size={11} />
-      </div>
-
-      {/* ── Image ── */}
-      <div style={{
-        width: 360, height: 240,
-        borderRadius: 6,
-        overflow: 'hidden',
-        position: 'relative',
-      }}>
-        <Image
-          src={img}
-          alt={title}
-          fill
-          style={{ objectFit: 'cover' }}
-          sizes="360px"
-        />
-      </div>
-
-      {/* ── Bottom row: title (right) + price (left) ── */}
-      <div style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginTop: 8,
-        gap: 8,
-      }}>
-        {/* In RTL: first child = right (title) */}
-        <p style={{
-          fontSize: 14, fontWeight: 500, color: C.text1,
-          margin: 0, lineHeight: '20px',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          whiteSpace: 'nowrap' as const,
-          flex: 1,
-        }}>
-          {title}
-        </p>
-        {/* Second child = left (price) */}
-        <span style={{
-          fontSize: 12, fontWeight: 400, color: C.text2,
-          flexShrink: 0, direction: 'ltr',
-        }}>
-          {price}
-        </span>
-      </div>
-    </a>
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="6" cy="6" r="4.5" stroke="#888" strokeWidth="1.2" />
+      <path d="M9.5 9.5L12.5 12.5" stroke="#888" strokeWidth="1.2" strokeLinecap="round" />
+    </svg>
   );
 }
 
@@ -274,48 +187,194 @@ function ProductCard({ type, price, title, img, href }: typeof products[0]) {
    HERO
 ═══════════════════════════════════════════════════ */
 function Hero() {
+  const [email, setEmail] = useState('');
+
   return (
-    <section style={{ paddingTop: 80 + 64, paddingBottom: 32 }}>
+    <section style={{ paddingTop: 80 + 64, paddingBottom: 40 }}>
       <div style={wrap()}>
         <h1 style={{
           fontSize: 28, fontWeight: 500, color: C.text1,
           lineHeight: '36px', letterSpacing: '-0.84px',
           margin: '0 0 10px',
         }}>
-          المُنتجات
+          الأفكار
         </h1>
         <p style={{
           fontSize: 16, fontWeight: 500, color: C.text2,
-          margin: 0, lineHeight: '26px',
+          margin: '0 0 20px', lineHeight: '26px',
         }}>
-          لدي حوالي ٨٠٠ طالب. أغلبهم اشتروا جميع منتجاتي
+          ٦،٤٠٠ خبير عربي يتابعون النشرة البريديّة
         </p>
+
+        {/* Newsletter form */}
+        <div style={{
+          display: 'flex',
+          borderRadius: 8,
+          overflow: 'hidden',
+          border: `1px solid ${C.border}`,
+          maxWidth: 400,
+        }}>
+          <input
+            type="email"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+            placeholder="hala@moedesigns.io"
+            style={{
+              flex: 1, padding: '11px 14px',
+              background: C.surface, border: 'none', outline: 'none',
+              fontSize: 15, color: C.text1,
+              fontFamily: 'inherit', direction: 'ltr' as const,
+            }}
+          />
+          <button style={{
+            padding: '11px 16px',
+            background: C.blue, border: 'none',
+            fontSize: 12, fontWeight: 500, color: '#fff',
+            cursor: 'pointer', flexShrink: 0, fontFamily: 'inherit',
+            borderRadius: '0 8px 8px 0',
+          }}>
+            اشترك في النشرة
+          </button>
+        </div>
       </div>
     </section>
   );
 }
 
 /* ═══════════════════════════════════════════════════
-   PRODUCTS GRID
+   ARTICLE ROW
 ═══════════════════════════════════════════════════ */
-function ProductsGrid() {
+function ArticleRow({ title, isFirst }: { title: string; isFirst?: boolean }) {
+  const [hov, setHov] = useState(false);
+
+  return (
+    <a
+      href="#"
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+      style={{
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: '12px 0',
+        borderTop: isFirst ? 'none' : `1px solid ${C.border}`,
+        textDecoration: 'none',
+        gap: 12,
+        direction: 'rtl',
+      }}
+    >
+      <h2 style={{
+        fontSize: 16,
+        fontWeight: 500,
+        color: hov ? C.text1 : C.text2,
+        margin: 0,
+        lineHeight: '24px',
+        transition: 'color 0.15s',
+        flex: 1,
+      }}>
+        {title}
+      </h2>
+      <Dots size={11} />
+    </a>
+  );
+}
+
+/* ═══════════════════════════════════════════════════
+   MAIN CONTENT (2-column)
+═══════════════════════════════════════════════════ */
+function MainContent() {
+  const [search, setSearch] = useState('');
+
+  const filtered = search.trim()
+    ? articles.filter(a => a.includes(search.trim()))
+    : articles;
+
   return (
     <section style={{ paddingBottom: 80 }}>
       <div style={wrap()}>
-        {/*
-          The original site uses a LTR grid inside the RTL page.
-          We override direction to ltr so col1 = physical left,
-          matching the live site layout.
-        */}
         <div style={{
-          display: 'grid',
-          gridTemplateColumns: '392px 392px',
-          gap: 16,
-          direction: 'ltr',
+          display: 'flex',
+          flexDirection: 'row',
+          gap: 10,
+          direction: 'rtl',
         }}>
-          {products.map((p, i) => (
-            <ProductCard key={i} {...p} />
-          ))}
+
+          {/* ── Left sidebar: categories ── */}
+          <aside style={{
+            width: 109,
+            flexShrink: 0,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 6,
+            paddingTop: 2,
+          }}>
+            {categories.map(cat => (
+              <a
+                key={cat}
+                href="#"
+                style={{
+                  display: 'inline-block',
+                  background: 'rgb(46, 30, 22)',
+                  color: C.orange,
+                  borderRadius: 6,
+                  padding: '4px 10px',
+                  fontSize: 12,
+                  fontWeight: 400,
+                  textDecoration: 'none',
+                  lineHeight: '20px',
+                  whiteSpace: 'nowrap' as const,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                }}
+              >
+                {cat}
+              </a>
+            ))}
+          </aside>
+
+          {/* ── Right column: search + articles ── */}
+          <div style={{ flex: 1, minWidth: 0 }}>
+
+            {/* Search bar */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              border: `1px solid ${C.border}`,
+              borderRadius: 8,
+              padding: '9px 12px',
+              marginBottom: 8,
+              background: 'transparent',
+              direction: 'rtl',
+            }}>
+              <SearchIcon />
+              <input
+                type="text"
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                placeholder="ابحث عن مقال"
+                style={{
+                  flex: 1,
+                  background: 'transparent',
+                  border: 'none',
+                  outline: 'none',
+                  fontSize: 14,
+                  color: C.text1,
+                  fontFamily: 'inherit',
+                  direction: 'rtl' as const,
+                }}
+              />
+            </div>
+
+            {/* Articles list */}
+            <div>
+              {filtered.map((title, i) => (
+                <ArticleRow key={i} title={title} isFirst={i === 0} />
+              ))}
+            </div>
+          </div>
+
         </div>
       </div>
     </section>
@@ -394,13 +453,13 @@ function Footer() {
 /* ═══════════════════════════════════════════════════
    PAGE ROOT
 ═══════════════════════════════════════════════════ */
-export default function ProductsPage() {
+export default function BlogPage() {
   return (
     <div style={{ background: C.bg, minHeight: '100vh' }}>
       <NavbarInner />
       <main>
         <Hero />
-        <ProductsGrid />
+        <MainContent />
         <Footer />
       </main>
     </div>

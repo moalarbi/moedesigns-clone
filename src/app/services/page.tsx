@@ -110,7 +110,7 @@ function NavbarInner() {
             { label: 'المنتجات', href: '/products' },
             { label: 'الخدمات',  href: '/services', active: true },
             { label: 'الأعمال',  href: '/works' },
-            { label: 'المقالات', href: '#' },
+            { label: 'المقالات', href: '/blog' },
           ].map(({ label, href, active }) => {
             const [hov, setHov] = useState(false);
             return (
