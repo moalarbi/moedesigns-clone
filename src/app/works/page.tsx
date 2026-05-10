@@ -3,7 +3,7 @@ import { useState, useEffect, CSSProperties } from 'react';
 import Image from 'next/image';
 
 /* ═══════════════════════════════════════════════════
-   DESIGN TOKENS  —  from moedesigns.io
+   DESIGN TOKENS
 ═══════════════════════════════════════════════════ */
 const C = {
   bg:          '#0f0f0f',
@@ -26,44 +26,50 @@ function wrap(extra: CSSProperties = {}): CSSProperties {
 }
 
 /* ═══════════════════════════════════════════════════
-   DATA
+   PORTFOLIO DATA — 39 projects
 ═══════════════════════════════════════════════════ */
-const products = [
-  {
-    type:  'دورة مسجّلة',
-    price: '$249',
-    title: 'المنهجيّة "العلميّة" في الكتابة الإعلانيّة',
-    img:   '/images/products/product-copywriting.png',
-    href:  '#',
-  },
-  {
-    type:  'دورة رقميّة مسجّلة',
-    price: '$199',
-    title: 'دورة تصميم وبناء المواقع',
-    img:   '/images/products/product-webdesign.png',
-    href:  '#',
-  },
-  {
-    type:  'كتيّب رقمي تفاعلي',
-    price: '$69',
-    title: 'كتيّب استراتيجيّة البراند الشخصي',
-    img:   '/images/products/product-brand.png',
-    href:  '#',
-  },
-  {
-    type:  'دورة مسجّلة',
-    price: '$199',
-    title: 'أساسيات بناء وتسويق الدورات الرقمية',
-    img:   '/images/products/product-courses.png',
-    href:  '#',
-  },
-  {
-    type:  'ورشة مسجّلة',
-    price: '$35',
-    title: 'ورشة الكتابة الإعلانيّة',
-    img:   '/images/products/product-workshop.png',
-    href:  '#',
-  },
+const works = [
+  /* ── First 12: images in /images/ ── */
+  { title: 'Luniva',                                    category: 'موقع تجاري',        img: '/images/portfolio-luniva.png' },
+  { title: 'شارك - Coworking',                          category: 'موقع تجاري',        img: '/images/portfolio-sharak.png' },
+  { title: 'منيرة | الاحتراق الوظيفي',                 category: 'منصّة تدريبيّة',    img: '/images/portfolio-muneera.png' },
+  { title: 'ثرى للعقار',                                category: 'موقع تجاري',        img: '/images/portfolio-thra.png' },
+  { title: 'حمد راشد الشامسي',                          category: 'منصّة تدريبيّة',    img: '/images/portfolio-hamad.png' },
+  { title: 'CX Hub Saudi',                              category: 'موقع تجاري',        img: '/images/portfolio-cxhub.png' },
+  { title: 'Treehaus',                                  category: 'موقع تجاري',        img: '/images/portfolio-treehaus.png' },
+  { title: 'elephantor',                                category: 'موقع تجاري',        img: '/images/portfolio-elephantor.png' },
+  { title: 'سالي الشوا',                                category: 'منصّة تدريبيّة',    img: '/images/portfolio-sali.png' },
+  { title: 'سارة الحميدان | مستشار ريادة أعمال',       category: 'منصّة تدريبيّة',    img: '/images/portfolio-sara.png' },
+  { title: 'أكاديميّة حضور',                            category: 'منصّة تدريبيّة',    img: '/images/portfolio-hudoor.png' },
+  { title: 'ستوديو مرام مختار',                         category: 'موقع تجاري',        img: '/images/portfolio-maram.png' },
+  /* ── Items 13–39: images in /images/works/ ── */
+  { title: 'د. جاسم العزاوي',                           category: 'موقع شخصي',         img: '/images/works/portfolio-jazem.png' },
+  { title: 'بيبيميلونز | أكادميّة تربية عالميّة',      category: 'منصّة تدريبيّة',    img: '/images/works/portfolio-babymillons.png' },
+  { title: 'د. شعاع دردوم',                             category: 'موقع شخصي',         img: '/images/works/portfolio-shua.png' },
+  { title: 'إيمان اللواتي',                             category: 'موقع شخصي',         img: '/images/works/portfolio-iman.png' },
+  { title: 'شغف: أكاديميّة الإنجليزيّة للأعمال',       category: 'منصّة تدريبيّة',    img: '/images/works/portfolio-shaghaf.png' },
+  { title: 'لولوة الكعبي',                              category: 'منصّة تدريبيّة',    img: '/images/works/portfolio-lulwa.png' },
+  { title: 'غدير الشهري',                               category: 'موقع شخصي',         img: '/images/works/portfolio-ghadir.png' },
+  { title: 'عبداللّه الغامدي',                          category: 'موقع شخصي',         img: '/images/works/portfolio-abdullahg.png' },
+  { title: 'dunecrest',                                  category: 'موقع تجاري',        img: '/images/works/portfolio-dunecrest.png' },
+  { title: 'تقى المرهون | استشاري ومدرّب تربية',       category: 'منصّة تدريبيّة',    img: '/images/works/portfolio-taqah.png' },
+  { title: 'نسوة',                                      category: 'موقع شخصي',         img: '/images/works/portfolio-niswah.png' },
+  { title: 'خولة المطيوعي | مدرّب حياة',               category: 'منصّة تدريبيّة',    img: '/images/works/portfolio-khawla.png' },
+  { title: 'فنك | مجتمع مسرحي',                         category: 'منصّة تدريبيّة',    img: '/images/works/portfolio-funk.png' },
+  { title: 'نقطتين | استوديو استشاري',                  category: 'موقع تجاري',        img: '/images/works/portfolio-nuqtatayn.png' },
+  { title: 'آلاء البيقاوي، مستشارة ريادية',            category: 'موقع شخصي',         img: '/images/works/portfolio-alaa.png' },
+  { title: 'سنـدس الساعاتي',                            category: 'موقع شخصي',         img: '/images/works/portfolio-sundus.png' },
+  { title: 'ديما نجّار',                                category: 'موقع شخصي',         img: '/images/works/portfolio-dima.png' },
+  { title: 'وعد طبّاش | أخصائي نفسي',                  category: 'موقع شخصي',         img: '/images/works/portfolio-waad.png' },
+  { title: 'بروجيكت بلـس',                              category: 'موقع تجاري',        img: '/images/works/portfolio-projectplus.png' },
+  { title: 'رصف',                                       category: 'موقع تجاري',        img: '/images/works/portfolio-rasaf.png' },
+  { title: 'جواهر المانع',                              category: 'موقع شخصي',         img: '/images/works/portfolio-jawahir.png' },
+  { title: 'MECA',                                      category: 'موقع تجاري',        img: '/images/works/portfolio-meca.png' },
+  { title: 'وفرة',                                      category: 'هويّة بصريّة',      img: '/images/works/portfolio-wafra.png' },
+  { title: 'Scrubs2Esates',                             category: 'موقع تجاري',        img: '/images/works/portfolio-scrubs.png' },
+  { title: 'انجي صبّاغ | مدرّبة حياة',                 category: 'موقع شخصي',         img: '/images/works/portfolio-anji.png' },
+  { title: 'زينا للمكسّرات',                            category: 'موقع تجاري',        img: '/images/works/portfolio-zeina.png' },
+  { title: 'د. هيا زيدان | الصحة النفسيّة للأمهات',   category: 'منصّة تدريبيّة',    img: '/images/works/portfolio-haya.png' },
 ];
 
 /* ═══════════════════════════════════════════════════
@@ -78,20 +84,6 @@ function Dots({ size = 13 }: { size?: number }) {
   );
 }
 
-/* Shopping-bag icon */
-function CartIcon() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"
-      xmlns="http://www.w3.org/2000/svg">
-      <rect x="1.5" y="5" width="11" height="7.5" rx="1.5"
-        stroke="#888" strokeWidth="1.15" fill="none" />
-      <path d="M4.5 5V3.7a2.5 2.5 0 015 0V5"
-        stroke="#888" strokeWidth="1.15" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-/* Ghost / outline button */
 function GhostBtn({ children, href = '#', small = false }: {
   children: React.ReactNode; href?: string; small?: boolean;
 }) {
@@ -140,18 +132,19 @@ function NavbarInner() {
     }}>
       <div style={{ ...wrap(), height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
 
-        {/* RTL right side: avatar + nav */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
-          <a href="/" style={{ flexShrink: 0, display: 'block',
+          <a href="/" style={{
+            flexShrink: 0, display: 'block',
             width: 32, height: 32, borderRadius: '50%', overflow: 'hidden',
-            background: C.surface }}>
+            background: C.surface,
+          }}>
             <Image src="/images/avatar.png" alt="avatar" width={32} height={32}
               style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           </a>
           {[
-            { label: 'المنتجات', href: '/products', active: true },
+            { label: 'المنتجات', href: '/products' },
             { label: 'الخدمات',  href: '/services' },
-            { label: 'الأعمال',  href: '/works' },
+            { label: 'الأعمال',  href: '/works', active: true },
             { label: 'المقالات', href: '#' },
           ].map(({ label, href, active }) => {
             const [hov, setHov] = useState(false);
@@ -172,7 +165,6 @@ function NavbarInner() {
           <Dots size={11} />
         </div>
 
-        {/* RTL left side: dots + CTA */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <Dots size={11} />
           <GhostBtn href="#">ابدأ باستشارة</GhostBtn>
@@ -183,112 +175,24 @@ function NavbarInner() {
 }
 
 /* ═══════════════════════════════════════════════════
-   PRODUCT CARD
-═══════════════════════════════════════════════════ */
-function ProductCard({ type, price, title, img, href }: typeof products[0]) {
-  const [hov, setHov] = useState(false);
-
-  return (
-    <a href={href}
-      onMouseEnter={() => setHov(true)}
-      onMouseLeave={() => setHov(false)}
-      style={{
-        display: 'block',
-        width: 392, height: 332,
-        borderRadius: 12,
-        border: `1px solid ${hov ? C.borderHover : C.border}`,
-        padding: '12px 16px',
-        textDecoration: 'none',
-        transition: 'border-color 0.2s ease',
-        boxSizing: 'border-box',
-        flexShrink: 0,
-        /* Cards need explicit RTL since they sit inside a direction:ltr grid */
-        direction: 'rtl',
-      }}
-    >
-      {/* ── Top row: dots (left) + type + cart (right) ── */}
-      <div style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        height: 24,
-        marginBottom: 8,
-      }}>
-        {/* In RTL: first child = right side */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <CartIcon />
-          <span style={{ fontSize: 12, fontWeight: 500, color: C.text2 }}>{type}</span>
-        </div>
-        {/* Second child = left side in RTL */}
-        <Dots size={11} />
-      </div>
-
-      {/* ── Image ── */}
-      <div style={{
-        width: 360, height: 240,
-        borderRadius: 6,
-        overflow: 'hidden',
-        position: 'relative',
-      }}>
-        <Image
-          src={img}
-          alt={title}
-          fill
-          style={{ objectFit: 'cover' }}
-          sizes="360px"
-        />
-      </div>
-
-      {/* ── Bottom row: title (right) + price (left) ── */}
-      <div style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginTop: 8,
-        gap: 8,
-      }}>
-        {/* In RTL: first child = right (title) */}
-        <p style={{
-          fontSize: 14, fontWeight: 500, color: C.text1,
-          margin: 0, lineHeight: '20px',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          whiteSpace: 'nowrap' as const,
-          flex: 1,
-        }}>
-          {title}
-        </p>
-        {/* Second child = left (price) */}
-        <span style={{
-          fontSize: 12, fontWeight: 400, color: C.text2,
-          flexShrink: 0, direction: 'ltr',
-        }}>
-          {price}
-        </span>
-      </div>
-    </a>
-  );
-}
-
-/* ═══════════════════════════════════════════════════
    HERO
 ═══════════════════════════════════════════════════ */
 function Hero() {
   return (
-    <section style={{ paddingTop: 80 + 64, paddingBottom: 32 }}>
+    <section style={{ paddingTop: 80 + 64, paddingBottom: 40 }}>
       <div style={wrap()}>
         <h1 style={{
           fontSize: 28, fontWeight: 500, color: C.text1,
           lineHeight: '36px', letterSpacing: '-0.84px',
           margin: '0 0 10px',
         }}>
-          المُنتجات
+          مشاريع وأعمال
         </h1>
         <p style={{
           fontSize: 16, fontWeight: 500, color: C.text2,
-          margin: 0, lineHeight: '26px',
+          margin: 0, lineHeight: '27.2px',
         }}>
-          لدي حوالي ٨٠٠ طالب. أغلبهم اشتروا جميع منتجاتي
+          مواقع، منصّات تعليميّة، هويّات بصريّة. ببساطة نبني براندات في بيع الخبرات
         </p>
       </div>
     </section>
@@ -296,25 +200,108 @@ function Hero() {
 }
 
 /* ═══════════════════════════════════════════════════
-   PRODUCTS GRID
+   PORTFOLIO CARD
 ═══════════════════════════════════════════════════ */
-function ProductsGrid() {
+function WorkCard({ title, category, img }: typeof works[0]) {
+  const [hov, setHov] = useState(false);
+
+  return (
+    <a href="#"
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 10,
+        paddingBottom: 12,
+        textDecoration: 'none',
+        cursor: 'pointer',
+      }}
+    >
+      {/* Image container */}
+      <div style={{
+        position: 'relative',
+        width: '100%',
+        aspectRatio: '3 / 2',
+        borderRadius: 10,
+        overflow: 'hidden',
+        transform: hov ? 'scale(1.015)' : 'scale(1)',
+        transition: 'transform 0.3s ease',
+      }}>
+        <Image
+          src={img}
+          alt={title}
+          fill
+          style={{ objectFit: 'cover' }}
+          sizes="(max-width: 880px) 100vw, 263px"
+        />
+      </div>
+
+      {/* Label row: category badge (left) | title + dots (right) */}
+      <div style={{
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        gap: 8,
+        direction: 'ltr',
+      }}>
+        {/* Left: category badge */}
+        <span style={{
+          fontSize: 12,
+          fontWeight: 400,
+          color: C.text3,
+          backgroundColor: C.surface,
+          borderRadius: 6,
+          padding: '6px 8px',
+          whiteSpace: 'nowrap' as const,
+          flexShrink: 0,
+          direction: 'rtl',
+        }}>
+          {category}
+        </span>
+
+        {/* Right: title + dots */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 6,
+          minWidth: 0,
+          direction: 'rtl',
+        }}>
+          <span style={{
+            fontSize: 12,
+            fontWeight: 400,
+            color: C.text1,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap' as const,
+          }}>
+            {title}
+          </span>
+          <Dots size={10} />
+        </div>
+      </div>
+    </a>
+  );
+}
+
+/* ═══════════════════════════════════════════════════
+   WORKS GRID
+═══════════════════════════════════════════════════ */
+function WorksGrid() {
   return (
     <section style={{ paddingBottom: 80 }}>
       <div style={wrap()}>
-        {/*
-          The original site uses a LTR grid inside the RTL page.
-          We override direction to ltr so col1 = physical left,
-          matching the live site layout.
-        */}
         <div style={{
           display: 'grid',
-          gridTemplateColumns: '392px 392px',
+          gridTemplateColumns: 'repeat(3, 1fr)',
           gap: 16,
+          rowGap: 32,
           direction: 'ltr',
         }}>
-          {products.map((p, i) => (
-            <ProductCard key={i} {...p} />
+          {works.map((w, i) => (
+            <WorkCard key={i} {...w} />
           ))}
         </div>
       </div>
@@ -335,7 +322,6 @@ function Footer() {
       borderTop: `1px solid ${C.border}`,
     }}>
       <div style={wrap()}>
-        {/* Newsletter */}
         <div style={{ marginBottom: 44, maxWidth: 420 }}>
           <p style={{ fontSize: 16, fontWeight: 400, color: C.text1, margin: '0 0 16px', lineHeight: '26px' }}>
             أحدث مقالاتي مباشرة في بريدك الالكتروني
@@ -364,7 +350,6 @@ function Footer() {
           </div>
         </div>
 
-        {/* Footer links */}
         <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap' as const }}>
           {['Bali / Dubai', 'hala@moedesigns.io', 'نشــرة', 'احجز استشارة 💤'].map((item, i, arr) => {
             const [hov, setHov] = useState(false);
@@ -394,13 +379,13 @@ function Footer() {
 /* ═══════════════════════════════════════════════════
    PAGE ROOT
 ═══════════════════════════════════════════════════ */
-export default function ProductsPage() {
+export default function WorksPage() {
   return (
     <div style={{ background: C.bg, minHeight: '100vh' }}>
       <NavbarInner />
       <main>
         <Hero />
-        <ProductsGrid />
+        <WorksGrid />
         <Footer />
       </main>
     </div>

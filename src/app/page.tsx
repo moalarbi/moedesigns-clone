@@ -209,7 +209,7 @@ function Navbar() {
           {[
             { label: 'المنتجات', href: '/products' },
             { label: 'الخدمات',  href: '/services' },
-            { label: 'الأعمال',  href: '#' },
+            { label: 'الأعمال',  href: '/works' },
             { label: 'المقالات', href: '#' },
           ].map(({ label, href }) => {
             const [hov, setHov] = useState(false);
