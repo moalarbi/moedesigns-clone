@@ -1,384 +1,268 @@
 'use client'
-
 import { useState, useEffect, useRef } from 'react'
 
-// ── DATA ─────────────────────────────────────────────────────────────
-const navLinks = [
-  { label: 'المقالات', href: '#articles' },
-  { label: 'الأعمال', href: '#portfolio' },
-  { label: 'الخدمات', href: '#services' },
-  { label: 'المنتجات', href: '#products' },
-]
-
-const heroCards = [
-  {
-    label: 'ابدأ معي',
-    title: 'احجز استشارة',
-    desc: 'جلسة مباشرة معي',
-    color: '#3ecf5c',
-    icon: '📅',
-    href: '#',
-  },
-  {
-    label: 'المقالات',
-    title: '١٥٠ مقال',
-    desc: 'في بيع الخبرات',
-    color: '#2151ff',
-    icon: '📝',
-    href: '#articles',
-  },
-  {
-    label: 'اعمل معي',
-    title: 'خدماتي والباقات',
-    desc: 'استشارات وتصميم',
-    color: '#ff7b0f',
-    icon: '🚀',
-    href: '#services',
-  },
-]
-
+/* ══════════════════════════════════════════════════════
+   DATA  —  exact text from moedesigns.io
+══════════════════════════════════════════════════════ */
 const portfolioItems = [
-  { title: 'Luniva', category: 'موقع تجاري', color: '#6b8a4a', img: '' },
-  { title: 'شارك', category: 'منصّة تدريبيّة', color: '#8B6F47', img: '' },
-  { title: 'نشرة', category: 'منصّة SaaS', color: '#4a6b8a', img: '' },
-  { title: 'منصّة خبرة', category: 'موقع تجاري', color: '#7a4a6b', img: '' },
-  { title: 'أكاديمية ريادة', category: 'منصّة تدريبيّة', color: '#6b4a3a', img: '' },
-  { title: 'برند بيرسونال', category: 'هويّة بصريّة', color: '#3a6b4a', img: '' },
-]
-
-const stats = [
-  { value: '٧', unit: 'سنوات', label: 'من الخبرة' },
-  { value: '٨٠+', unit: 'مؤسّس', label: 'تمّ مساعدتهم' },
-  { value: '٤٠٠٪', unit: 'ROI', label: 'عائد استثمار' },
-]
-
-const clients = [
-  'Wfrah', 'McKinsey', 'Mindvalley', 'RASF', 'Salla', 'Zid', 'Foodics',
-  'Wfrah', 'McKinsey', 'Mindvalley', 'RASF', 'Salla', 'Zid', 'Foodics',
+  { id:1, title:'Luniva',  cat:'موقع تجاري',      bg:'#7c5a3e', accent:'#a8724a' },
+  { id:2, title:'شارك',    cat:'منصّة تدريبيّة',   bg:'#3d5a3e', accent:'#4e7a50' },
+  { id:3, title:'برند',    cat:'هويّة بصريّة',     bg:'#4a3d5a', accent:'#6a5a7a' },
+  { id:4, title:'نشرة',    cat:'منصّة SaaS',       bg:'#3a4d5a', accent:'#4a6d7a' },
+  { id:5, title:'أكاديمية','cat':'منصّة تدريبيّة', bg:'#5a3d3a', accent:'#7a5550' },
+  { id:6, title:'استشارة', cat:'موقع تجاري',       bg:'#3d4a3a', accent:'#556a52' },
 ]
 
 const products = [
-  { type: 'دورة مسجّلة', title: 'المنهجيّة في الكتابة الإعلانيّة', price: '$249', bg: '#1a1a2e' },
-  { type: 'دورة رقميّة', title: 'دورة تصميم وبناء المواقع', price: '$199', bg: '#1a2e1a' },
-  { type: 'كتيّب رقمي', title: 'كتيّب استراتيجيّة البراند', price: '$69', bg: '#2e1a1a' },
-  { type: 'ورشة', title: 'ورشة بيع الخدمات الأغلى', price: '$35', bg: '#1a2a2e' },
+  { type:'دورة مسجّلة', title:'المنهجيّة في الكتابة الإعلانيّة',   price:'$249', emoji:'✍️', bg:'#1a1830' },
+  { type:'دورة رقميّة', title:'دورة تصميم وبناء المواقع',            price:'$199', emoji:'🖥️', bg:'#0f1f18' },
+  { type:'كتيّب رقمي',  title:'كتيّب استراتيجيّة البراند',          price:'$69',  emoji:'📖', bg:'#1e1408' },
+  { type:'ورشة',        title:'ورشة بيع الخدمات الأغلى ثمناً',     price:'$35',  emoji:'🎤', bg:'#0d1520' },
+]
+
+const services = [
+  'البيع والتسعير',
+  'السوشال ميديا والإعلام',
+  'التسويق والتوسّع',
+  'الاستراتيجيّة والتمركز',
+  'بناء المشروع والمنتجات',
 ]
 
 const articles = [
-  'منهجيّتي لبيع الخدمات الأغلى ثمناً',
-  '٤ قِيَم تُحدّد سعر خدماتك',
-  'تقرير: هل ما زال بيع الدورات مشروعاً مُربحاً؟',
-  'كيف تبني براند شخصي يبيع وأنت نائم',
-  'الدليل الكامل لتأسيس مشروع استشاري ناجح',
-  'أسرار التسعير عند كبار الخبراء',
+  { title:'منهجيّتي لبيع الخدمات الأغلى | Hight ticket',                                  thumb:'' },
+  { title:'٤ قِيَم. كُل أصحاب البراندات الناجحة كانت عندهم',                               thumb:'👤' },
+  { title:'تقرير: هل ما زال بيع الدورات مشروع مُربح؟',                                    thumb:'' },
+  { title:'٣ أسئلة قبل أن أبدأ بأي مشروع',                                                thumb:'📕' },
+  { title:'درست حَملات أفضل من يبيعون المنتجات الرقميّة. اتّضح أن لديهم سر.',             thumb:'' },
+  { title:'التخصّص يحميك من تجاوزاتك الفكريّة',                                           thumb:'🍴' },
+  { title:'لماذا أفضّل التخصّص في المُشكلة وليس في التكنيك (الحِرفة)؟',                   thumb:'' },
+  { title:'٤ تخصّصات استشاريّة ستحقق الملايين بحلول ٢٠٢٨',                               thumb:'📈' },
 ]
 
-// ── NAVBAR ────────────────────────────────────────────────────────────
+const clients = ['Wfrah','McKinsey & Company','Mindvalley','RASF','Salla','Zid','Foodics','Almosafer']
+
+/* ══════════════════════════════════════════════════════
+   NAVBAR
+══════════════════════════════════════════════════════ */
 function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 40)
-    window.addEventListener('scroll', onScroll)
-    return () => window.removeEventListener('scroll', onScroll)
+    const fn = () => setScrolled(window.scrollY > 20)
+    window.addEventListener('scroll', fn, { passive:true })
+    return () => window.removeEventListener('scroll', fn)
   }, [])
 
   return (
-    <nav
-      className={`fixed top-0 right-0 left-0 z-50 transition-all duration-300 ${
-        scrolled
-          ? 'bg-[#0f0f0f]/95 backdrop-blur-md border-b border-white/5 py-3'
-          : 'bg-transparent py-5'
-      }`}
-    >
-      <div className="max-w-7xl mx-auto px-6 flex items-center justify-between" dir="rtl">
-        {/* Logo */}
-        <a href="/" className="flex items-center gap-2">
-          <div className="w-9 h-9 rounded-xl bg-[#2151ff] flex items-center justify-center text-white font-bold text-sm">
-            م
-          </div>
-          <span className="text-[#ebebeb] font-semibold text-lg hidden sm:block">محمّد الحكيم</span>
-        </a>
+    <nav style={{
+      position:'fixed', top:0, right:0, left:0, zIndex:50,
+      transition:'background 0.3s, border-color 0.3s',
+      background: scrolled ? 'rgba(15,15,15,0.92)' : 'transparent',
+      backdropFilter: scrolled ? 'blur(12px)' : 'none',
+      borderBottom: scrolled ? '1px solid rgba(255,255,255,0.06)' : '1px solid transparent',
+    }}>
+      <div className="container" style={{ display:'flex', alignItems:'center', justifyContent:'space-between', height:68, direction:'rtl' }}>
 
-        {/* Nav links – desktop */}
-        <div className="hidden md:flex items-center gap-8">
-          {navLinks.map((link) => (
-            <a
-              key={link.label}
-              href={link.href}
-              className="text-[#888] hover:text-[#ebebeb] text-sm transition-colors duration-200"
-            >
-              {link.label}
-            </a>
-          ))}
+        {/* RIGHT: avatar + nav links + dots */}
+        <div style={{ display:'flex', alignItems:'center', gap:32 }}>
+          {/* Avatar */}
+          <div style={{
+            width:36, height:36, borderRadius:'50%',
+            background:'linear-gradient(135deg,#555,#333)',
+            border:'1.5px solid rgba(255,255,255,0.15)',
+            display:'flex', alignItems:'center', justifyContent:'center',
+            fontSize:14, color:'#aaa', flexShrink:0, overflow:'hidden',
+          }}>م</div>
+
+          {/* Nav links */}
+          <div style={{ display:'flex', gap:28 }} className="hidden-mobile">
+            {['المنتجات','الخدمات','الأعمال','المقالات'].map(l => (
+              <a key={l} href="#" style={{
+                fontSize:16, fontWeight:400, color:'#d9d9d9',
+                transition:'color 0.2s', padding:'4px 0',
+              }}
+              onMouseEnter={e=>(e.currentTarget.style.color='#fff')}
+              onMouseLeave={e=>(e.currentTarget.style.color='#d9d9d9')}
+              >{l}</a>
+            ))}
+          </div>
+
           {/* Dots menu */}
           <button
             onClick={() => setMenuOpen(!menuOpen)}
-            className="text-[#888] hover:text-[#ebebeb] transition-colors text-lg"
-          >
-            ···
-          </button>
+            style={{ color:'#d9d9d9', fontSize:20, background:'none', border:'none', cursor:'pointer', letterSpacing:2, lineHeight:1 }}
+          >···</button>
         </div>
 
-        {/* CTA */}
-        <a
-          href="#contact"
-          className="hidden md:block px-5 py-2 rounded-full bg-[#2151ff] text-white text-sm font-medium hover:opacity-90 hover:shadow-[0_0_20px_rgba(33,81,255,0.4)] transition-all duration-200"
+        {/* LEFT: CTA button */}
+        <button style={{
+          fontSize:13, fontWeight:500, color:'#ededed',
+          background:'rgba(255,255,255,0.04)',
+          border:'1px solid rgba(255,255,255,0.12)',
+          borderRadius:20, padding:'8px 18px',
+          cursor:'pointer', display:'flex', alignItems:'center', gap:8,
+          transition:'background 0.2s, border-color 0.2s',
+          fontFamily:'inherit',
+        }}
+        onMouseEnter={e=>{ e.currentTarget.style.background='rgba(255,255,255,0.08)'; }}
+        onMouseLeave={e=>{ e.currentTarget.style.background='rgba(255,255,255,0.04)'; }}
         >
+          <span style={{ fontSize:12, opacity:.5, letterSpacing:2 }}>···</span>
           ابدأ باستشارة
-        </a>
-
-        {/* Mobile hamburger */}
-        <button
-          className="md:hidden text-[#ebebeb] text-2xl"
-          onClick={() => setMenuOpen(!menuOpen)}
-        >
-          {menuOpen ? '✕' : '☰'}
         </button>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Dropdown */}
       {menuOpen && (
-        <div className="md:hidden bg-[#171717] border-t border-white/5 px-6 py-4 flex flex-col gap-4" dir="rtl">
-          {navLinks.map((link) => (
-            <a
-              key={link.label}
-              href={link.href}
-              className="text-[#d9d9d9] text-sm hover:text-white"
-              onClick={() => setMenuOpen(false)}
-            >
-              {link.label}
-            </a>
-          ))}
-          <a
-            href="#contact"
-            className="inline-block px-5 py-2.5 rounded-full bg-[#2151ff] text-white text-sm font-medium text-center"
-          >
-            ابدأ باستشارة
-          </a>
+        <div style={{
+          position:'absolute', top:68, right:0, left:0,
+          background:'rgba(20,20,20,0.98)', backdropFilter:'blur(16px)',
+          borderBottom:'1px solid rgba(255,255,255,0.06)',
+          padding:'16px 48px 20px',
+        }} dir="rtl">
+          <div style={{ display:'flex', flexWrap:'wrap', gap:24 }}>
+            {['مصادر مجّانيّة','البودكاست','التواصل','الوضع الليّلي'].map(i=>(
+              <a key={i} href="#" style={{ color:'#d9d9d9', fontSize:15, transition:'color 0.2s' }}
+              onMouseEnter={e=>e.currentTarget.style.color='#fff'}
+              onMouseLeave={e=>e.currentTarget.style.color='#d9d9d9'}
+              >{i}</a>
+            ))}
+          </div>
         </div>
       )}
     </nav>
   )
 }
 
-// ── HERO ──────────────────────────────────────────────────────────────
+/* ══════════════════════════════════════════════════════
+   HERO
+══════════════════════════════════════════════════════ */
 function Hero() {
   return (
-    <section className="relative min-h-screen flex flex-col justify-center pt-24 pb-16 px-6 overflow-hidden">
-      {/* Glow BG */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-[#2151ff]/8 rounded-full blur-[120px]" />
-        <div className="absolute top-1/3 right-0 w-[400px] h-[400px] bg-[#ff7b0f]/6 rounded-full blur-[100px]" />
-      </div>
+    <section style={{ minHeight:'100vh', display:'flex', flexDirection:'column', justifyContent:'center', paddingTop:100, paddingBottom:64 }} dir="rtl">
+      <div className="container">
 
-      <div className="max-w-7xl mx-auto w-full relative" dir="rtl">
-        {/* Badge */}
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#2151ff]/30 bg-[#2151ff]/10 text-[#2151ff] text-sm mb-8 animate-fade-in">
-          <span className="w-2 h-2 rounded-full bg-[#3ecf5c] animate-pulse" />
-          متاح للمشاريع الجديدة
-        </div>
-
-        {/* Headline */}
-        <h1
-          className="font-bold text-[#ebebeb] leading-tight mb-6 animate-slide-up"
-          style={{ fontSize: 'clamp(40px, 5.5vw, 72px)', maxWidth: '800px' }}
-        >
-          مستشارك في
-          <br />
-          <span className="text-[#ff7b0f]">بيع الخبرات</span>
-          <br />
-          وتأسيس المشاريع
+        {/* H1 */}
+        <h1 style={{
+          fontSize:'clamp(32px, 4vw, 56px)',
+          fontWeight:500,
+          color:'#ededed',
+          lineHeight:1.3,
+          letterSpacing:'-0.02em',
+          maxWidth:700,
+          marginBottom:64,
+          animation:'fadeUp 0.7s ease forwards',
+        }}>
+          مستشار في بناء المشاريع<br />
+          الاستشاريّة والتدريبيّة.<br />
+          رائد أعمال وكاتب.
         </h1>
 
-        {/* Subheading */}
-        <p
-          className="text-[#888888] mb-10 max-w-lg leading-relaxed animate-slide-up delay-200"
-          style={{ fontSize: 'clamp(15px, 1.3vw, 19px)' }}
-        >
-          خلال ٧ سنوات ساعدت أكثر من ٨٠ مؤسّس يبدأ مشروعه في بيع الخبرات بعائد استثمار يبدأ من ٤٠٠٪
-        </p>
-
-        {/* CTA Buttons */}
-        <div className="flex flex-wrap gap-3 mb-16 animate-slide-up delay-300">
-          <a
-            href="#contact"
-            className="px-7 py-3.5 rounded-full bg-[#2151ff] text-white font-medium hover:opacity-90 hover:shadow-[0_0_30px_rgba(33,81,255,0.45)] transition-all duration-200"
-            style={{ fontSize: '15px' }}
-          >
-            احجز استشارة مجّانيّة
-          </a>
-          <a
-            href="#portfolio"
-            className="px-7 py-3.5 rounded-full bg-white/5 border border-white/10 text-[#ebebeb] hover:bg-white/10 transition-all duration-200"
-            style={{ fontSize: '15px' }}
-          >
-            شاهد أعمالي ←
-          </a>
+        {/* 3 Cards */}
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:12, maxWidth:900 }}>
+          {/* Card 1 – ابدأ معي / احجز استشارة */}
+          <HeroCard
+            topLabel="ابدأ معي"
+            mainText="احجز استشارة"
+            accent="green"
+            dot={true}
+          />
+          {/* Card 2 – المقالات */}
+          <HeroCard
+            topLabel="المقالات"
+            mainText="١٥٠ مقال في بيع الخبرات"
+            accent="none"
+          />
+          {/* Card 3 – اعمل معي */}
+          <HeroCard
+            topLabel="اعمل معي"
+            mainText="خدماتي والباقات"
+            accent="none"
+          />
         </div>
 
-        {/* Hero Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 animate-slide-up delay-400">
-          {heroCards.map((card) => (
-            <a
-              key={card.title}
-              href={card.href}
-              className="group relative p-5 rounded-2xl bg-[#171717] border border-white/5 hover:border-white/10 hover:-translate-y-1 transition-all duration-300 overflow-hidden"
-            >
-              <div
-                className="absolute top-0 right-0 w-32 h-32 rounded-full blur-[60px] opacity-20 group-hover:opacity-40 transition-opacity"
-                style={{ backgroundColor: card.color }}
-              />
-              <div className="relative">
-                <span className="text-2xl mb-3 block">{card.icon}</span>
-                <span
-                  className="text-xs font-medium px-2 py-0.5 rounded-full mb-2 inline-block"
-                  style={{ backgroundColor: `${card.color}20`, color: card.color }}
-                >
-                  {card.label}
-                </span>
-                <h3 className="text-[#ebebeb] font-semibold text-lg">{card.title}</h3>
-                <p className="text-[#888] text-sm mt-1">{card.desc}</p>
-              </div>
-            </a>
-          ))}
+        {/* Section label below */}
+        <div style={{ marginTop:80, display:'flex', justifyContent:'flex-end' }}>
+          <span style={{ fontSize:18, color:'#ededed', fontWeight:400 }}>
+            أحدث أعمالي ←
+          </span>
         </div>
       </div>
     </section>
   )
 }
 
-// ── STATS ────────────────────────────────────────────────────────────
-function Stats() {
-  const ref = useRef<HTMLDivElement>(null)
-  const [visible, setVisible] = useState(false)
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) setVisible(true) },
-      { threshold: 0.3 }
-    )
-    if (ref.current) observer.observe(ref.current)
-    return () => observer.disconnect()
-  }, [])
-
+function HeroCard({ topLabel, mainText, accent, dot }: {
+  topLabel:string; mainText:string; accent:string; dot?:boolean;
+}) {
+  const [hov, setHov] = useState(false)
   return (
-    <section ref={ref} className="py-20 px-6 border-y border-white/5">
-      <div className="max-w-5xl mx-auto" dir="rtl">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 text-center">
-          {stats.map((stat, i) => (
-            <div
-              key={stat.label}
-              className={`transition-all duration-700 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
-              style={{ transitionDelay: `${i * 150}ms` }}
-            >
-              <div className="text-5xl font-bold text-[#ebebeb] mb-1">
-                {stat.value}
-                <span className="text-[#ff7b0f] text-3xl mr-1">{stat.unit}</span>
-              </div>
-              <div className="text-[#888] text-sm mt-1">{stat.label}</div>
-            </div>
-          ))}
+    <div
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+      style={{
+        background: hov ? '#1e1e1e' : '#161616',
+        border:'1px solid rgba(255,255,255,0.07)',
+        borderRadius:16,
+        padding:'20px 22px 22px',
+        cursor:'pointer',
+        transition:'background 0.25s, transform 0.25s',
+        transform: hov ? 'translateY(-3px)' : 'none',
+        minHeight:120,
+        display:'flex', flexDirection:'column', justifyContent:'space-between',
+      }}
+    >
+      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:16 }}>
+        <p style={{ fontSize:13, fontWeight:400, color:'#d9d9d9', opacity:.7 }}>{topLabel}</p>
+        <div style={{ display:'flex', gap:3 }}>
+          {dot && (
+            <span style={{
+              width:7, height:7, borderRadius:'50%',
+              background:'#00c763', display:'inline-block',
+              boxShadow:'0 0 8px #00c76366',
+            }} className="dot-blink" />
+          )}
+          <span style={{ fontSize:10, color:'rgba(255,255,255,0.15)', letterSpacing:2 }}>···</span>
         </div>
       </div>
-    </section>
+      <p style={{ fontSize:18, fontWeight:400, color:'#ededed', lineHeight:1.35 }}>{mainText}</p>
+    </div>
   )
 }
 
-// ── PORTFOLIO ────────────────────────────────────────────────────────
+/* ══════════════════════════════════════════════════════
+   PORTFOLIO CAROUSEL
+══════════════════════════════════════════════════════ */
 function Portfolio() {
-  const [active, setActive] = useState(0)
-  const ref = useRef<HTMLDivElement>(null)
-  const [visible, setVisible] = useState(false)
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) setVisible(true) },
-      { threshold: 0.1 }
-    )
-    if (ref.current) observer.observe(ref.current)
-    return () => observer.disconnect()
-  }, [])
+  const [idx, setIdx] = useState(0)
+  const perView = 2
+  const max = portfolioItems.length - perView
 
   return (
-    <section id="portfolio" ref={ref} className="py-24 px-6">
-      <div className="max-w-7xl mx-auto" dir="rtl">
+    <section style={{ paddingBottom:80 }} dir="rtl">
+      <div className="container">
         {/* Header */}
-        <div className={`mb-12 transition-all duration-700 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-          <span className="text-[#ff7b0f] text-sm font-medium mb-2 block">الأعمال</span>
-          <h2 className="font-bold text-[#ebebeb]" style={{ fontSize: 'clamp(28px, 3vw, 42px)' }}>
-            أحدث أعمالي
-          </h2>
+        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:28 }}>
+          <div /> {/* spacer */}
+          <h2 style={{ fontSize:18, fontWeight:400, color:'#ededed' }}>أحدث أعمالي ←</h2>
         </div>
 
-        {/* Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {portfolioItems.map((item, i) => (
-            <div
-              key={item.title}
-              className={`group relative rounded-2xl overflow-hidden cursor-pointer transition-all duration-700 ${
-                visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
-              }`}
-              style={{
-                transitionDelay: `${i * 100}ms`,
-                background: `linear-gradient(135deg, ${item.color}40 0%, ${item.color}15 100%)`,
-                border: '1px solid rgba(255,255,255,0.06)',
-                minHeight: '240px',
-              }}
-              onClick={() => setActive(i)}
-            >
-              {/* Overlay gradient */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-
-              {/* Content */}
-              <div className="absolute bottom-0 right-0 left-0 p-5">
-                <span
-                  className="text-xs font-medium px-3 py-1 rounded-full mb-2 inline-block"
-                  style={{ backgroundColor: `${item.color}30`, color: '#d9d9d9' }}
-                >
-                  {item.category}
-                </span>
-                <h3 className="text-[#ebebeb] font-bold text-xl">{item.title}</h3>
-              </div>
-
-              {/* Hover arrow */}
-              <div className="absolute top-4 left-4 w-8 h-8 rounded-full bg-white/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                ←
-              </div>
-            </div>
-          ))}
+        {/* Arrows */}
+        <div style={{ display:'flex', justifyContent:'flex-start', gap:8, marginBottom:20 }}>
+          <CarouselBtn dir="right" onClick={() => setIdx(i => Math.max(0,i-1))} disabled={idx===0} />
+          <CarouselBtn dir="left"  onClick={() => setIdx(i => Math.min(max,i+1))} disabled={idx>=max} />
         </div>
 
-        {/* CTA */}
-        <div className="text-center mt-10">
-          <a
-            href="#"
-            className="inline-block px-7 py-3 rounded-full bg-white/5 border border-white/10 text-[#d9d9d9] text-sm hover:bg-white/10 transition-all"
-          >
-            عرض جميع الأعمال ←
-          </a>
-        </div>
-      </div>
-    </section>
-  )
-}
-
-// ── CLIENTS ───────────────────────────────────────────────────────────
-function Clients() {
-  return (
-    <section className="py-14 px-6 border-y border-white/5 overflow-hidden">
-      <div className="max-w-7xl mx-auto" dir="rtl">
-        <p className="text-center text-[#888] text-sm mb-8">عملائي يشملون</p>
-        <div className="relative">
-          <div className="flex gap-12 animate-scroll-left" style={{ width: 'max-content' }}>
-            {clients.map((name, i) => (
-              <span
-                key={`${name}-${i}`}
-                className="text-[#555] hover:text-[#888] text-base font-medium whitespace-nowrap transition-colors cursor-default"
-              >
-                {name}
-              </span>
+        {/* Track */}
+        <div style={{ overflow:'hidden' }}>
+          <div style={{
+            display:'flex', gap:16,
+            transform:`translateX(${idx * (50+1)}%)`,
+            transition:'transform 0.4s cubic-bezier(0.4,0,0.2,1)',
+          }}>
+            {portfolioItems.map(item => (
+              <PortfolioCard key={item.id} {...item} />
             ))}
           </div>
         </div>
@@ -387,261 +271,549 @@ function Clients() {
   )
 }
 
-// ── PRODUCTS ──────────────────────────────────────────────────────────
-function Products() {
-  const ref = useRef<HTMLDivElement>(null)
-  const [visible, setVisible] = useState(false)
+function CarouselBtn({ dir, onClick, disabled }: { dir:'left'|'right'; onClick:()=>void; disabled:boolean }) {
+  return (
+    <button onClick={onClick} disabled={disabled} style={{
+      width:36, height:36, borderRadius:'50%',
+      background:'rgba(255,255,255,0.04)',
+      border:'1px solid rgba(255,255,255,0.1)',
+      color: disabled ? 'rgba(255,255,255,0.2)' : '#d9d9d9',
+      fontSize:16, cursor: disabled ? 'default' : 'pointer',
+      display:'flex', alignItems:'center', justifyContent:'center',
+      transition:'background 0.2s',
+    }}>{dir==='right' ? '→' : '←'}</button>
+  )
+}
 
+function PortfolioCard({ title, cat, bg, accent }: typeof portfolioItems[0]) {
+  const [hov, setHov] = useState(false)
+  return (
+    <div
+      onMouseEnter={()=>setHov(true)}
+      onMouseLeave={()=>setHov(false)}
+      style={{
+        flexShrink:0,
+        width:'calc(50% - 8px)',
+        minHeight:380,
+        borderRadius:20,
+        background:`linear-gradient(145deg, ${bg} 0%, ${accent}88 100%)`,
+        position:'relative', overflow:'hidden',
+        cursor:'pointer',
+        transform: hov ? 'scale(1.01)' : 'scale(1)',
+        transition:'transform 0.3s ease',
+        border:'1px solid rgba(255,255,255,0.06)',
+      }}
+    >
+      {/* Browser mockup */}
+      <div style={{
+        margin:'32px 28px 0',
+        background:'#fff',
+        borderRadius:'12px 12px 0 0',
+        overflow:'hidden',
+        height:260,
+        boxShadow:'0 8px 32px rgba(0,0,0,0.4)',
+      }}>
+        {/* Browser chrome */}
+        <div style={{ background:'#f0f0f0', padding:'8px 12px', display:'flex', alignItems:'center', gap:6 }}>
+          <span style={{ width:8, height:8, borderRadius:'50%', background:'#ff5f57', display:'inline-block' }} />
+          <span style={{ width:8, height:8, borderRadius:'50%', background:'#ffbe2e', display:'inline-block' }} />
+          <span style={{ width:8, height:8, borderRadius:'50%', background:'#27c840', display:'inline-block' }} />
+          <span style={{ flex:1, background:'#e0e0e0', borderRadius:4, height:14, marginRight:8 }} />
+        </div>
+        {/* Website preview */}
+        <div style={{
+          height:'100%',
+          background:`linear-gradient(160deg, ${bg}cc 0%, #111 100%)`,
+          display:'flex', alignItems:'center', justifyContent:'center',
+        }}>
+          <span style={{ color:'rgba(255,255,255,0.3)', fontSize:32, fontWeight:700 }}>{title}</span>
+        </div>
+      </div>
+
+      {/* Info */}
+      <div style={{ position:'absolute', bottom:0, right:0, left:0, padding:'20px 28px', background:'linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%)' }}>
+        <span style={{ fontSize:10, color:'#d9d9d9', opacity:.7, display:'block', marginBottom:4 }}>{cat}</span>
+        <span style={{ fontSize:16, fontWeight:500, color:'#ededed' }}>{title}</span>
+      </div>
+    </div>
+  )
+}
+
+/* ══════════════════════════════════════════════════════
+   STATS — "خلال ٧ سنوات..."
+══════════════════════════════════════════════════════ */
+function Stats() {
+  const ref = useRef<HTMLDivElement>(null)
+  const [vis, setVis] = useState(false)
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) setVisible(true) },
-      { threshold: 0.1 }
-    )
-    if (ref.current) observer.observe(ref.current)
-    return () => observer.disconnect()
+    const ob = new IntersectionObserver(([e]) => { if(e.isIntersecting) setVis(true) }, { threshold:0.2 })
+    if(ref.current) ob.observe(ref.current)
+    return () => ob.disconnect()
   }, [])
 
   return (
-    <section id="products" ref={ref} className="py-24 px-6">
-      <div className="max-w-7xl mx-auto" dir="rtl">
-        <div className={`mb-12 transition-all duration-700 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-          <span className="text-[#2151ff] text-sm font-medium mb-2 block">المنتجات</span>
-          <h2 className="font-bold text-[#ebebeb]" style={{ fontSize: 'clamp(28px, 3vw, 42px)' }}>
-            أحدث المنتجات
-          </h2>
+    <section ref={ref} style={{ padding:'40px 0 60px' }} dir="rtl">
+      <div className="container">
+        <div style={{
+          background:'#171717',
+          borderRadius:16,
+          padding:'36px 40px',
+          opacity: vis ? 1 : 0,
+          transform: vis ? 'none' : 'translateY(20px)',
+          transition:'opacity 0.7s ease, transform 0.7s ease',
+        }}>
+          <p style={{
+            fontSize:'clamp(16px, 1.5vw, 20px)',
+            fontWeight:400,
+            color:'#ededed',
+            lineHeight:1.8,
+            textAlign:'right',
+          }}>
+            خلال{' '}
+            <StatNum>٧ سنوات</StatNum>
+            {' '}ساعدت{' '}
+            <StatNum>80+</StatNum>
+            {' '}مؤسّس ليبدأ مشروعه في بيع الخبرات.{' '}
+            عُملائي يشهدون بعائد استثمار يبدأ من{' '}
+            <StatNum>400%</StatNum>
+            {' '}خلال السنة الأولى
+          </p>
         </div>
+      </div>
+    </section>
+  )
+}
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {products.map((product, i) => (
-            <div
-              key={product.title}
-              className={`group rounded-2xl border border-white/5 hover:border-white/10 overflow-hidden cursor-pointer transition-all duration-700 hover:-translate-y-1 ${
-                visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-              }`}
-              style={{
-                backgroundColor: product.bg,
-                transitionDelay: `${i * 100}ms`,
-              }}
-            >
-              {/* Thumbnail area */}
-              <div className="h-40 flex items-center justify-center relative overflow-hidden">
-                <div
-                  className="absolute inset-0 opacity-30"
-                  style={{
-                    background: `radial-gradient(circle at 30% 70%, ${i === 0 ? '#2151ff' : i === 1 ? '#3ecf5c' : i === 2 ? '#ff7b0f' : '#9b59b6'}40 0%, transparent 70%)`,
-                  }}
-                />
-                <span className="text-4xl relative z-10">
-                  {i === 0 ? '✍️' : i === 1 ? '🎨' : i === 2 ? '📖' : '🎤'}
-                </span>
-              </div>
-              {/* Info */}
-              <div className="p-4">
-                <span className="text-xs text-[#888] bg-white/5 px-2 py-0.5 rounded-full">{product.type}</span>
-                <h3 className="text-[#ebebeb] text-sm font-medium mt-2 leading-snug">{product.title}</h3>
-                <div className="flex items-center justify-between mt-3">
-                  <span className="text-[#ff7b0f] font-bold">{product.price}</span>
-                  <span className="text-xs text-[#888] group-hover:text-[#ebebeb] transition-colors">شراء ←</span>
+function StatNum({ children }: { children:React.ReactNode }) {
+  return <span style={{ color:'#ededed', fontWeight:600 }}>{children}</span>
+}
+
+/* ══════════════════════════════════════════════════════
+   CLIENTS TICKER
+══════════════════════════════════════════════════════ */
+function Clients() {
+  const doubled = [...clients, ...clients]
+  return (
+    <section style={{ padding:'32px 0', overflow:'hidden', borderTop:'1px solid rgba(255,255,255,0.05)', borderBottom:'1px solid rgba(255,255,255,0.05)' }}>
+      <div style={{ display:'flex', gap:64, width:'max-content' }} className="scroll-ticker">
+        {doubled.map((c,i) => (
+          <span key={i} style={{ fontSize:15, color:'rgba(255,255,255,0.25)', whiteSpace:'nowrap', letterSpacing:.5 }}>{c}</span>
+        ))}
+      </div>
+    </section>
+  )
+}
+
+/* ══════════════════════════════════════════════════════
+   NASHRA SECTION
+══════════════════════════════════════════════════════ */
+function NashraSection() {
+  return (
+    <section style={{ padding:'60px 0' }} dir="rtl">
+      <div className="container">
+        <div style={{
+          background:'#171717',
+          borderRadius:16,
+          padding:'40px 44px',
+          display:'grid',
+          gridTemplateColumns:'1fr 1fr',
+          gap:48,
+          alignItems:'center',
+        }}>
+          {/* Left: content */}
+          <div>
+            <span style={{ fontSize:12, color:'rgba(255,255,255,0.3)', letterSpacing:1, textTransform:'uppercase', display:'block', marginBottom:12 }}>Nashra.ai</span>
+            <h3 style={{ fontSize:'clamp(22px,2.5vw,32px)', fontWeight:500, color:'#ededed', lineHeight:1.35, marginBottom:16 }}>
+              نشرتك البريديّة + مدوّنتك
+            </h3>
+            <p style={{ fontSize:15, color:'#888', marginBottom:28 }}>تواصل مع متابعينك مباشرة</p>
+            <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
+              {['الاشتراك والتفاصيل','تدعم الكتابة بالعربي','صفحات هبوط'].map(f => (
+                <div key={f} style={{ display:'flex', alignItems:'center', gap:10 }}>
+                  <span style={{ color:'#00c763', fontSize:14 }}>✓</span>
+                  <span style={{ fontSize:14, color:'#d9d9d9' }}>{f}</span>
                 </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  )
-}
-
-// ── ARTICLES ──────────────────────────────────────────────────────────
-function Articles() {
-  const ref = useRef<HTMLDivElement>(null)
-  const [visible, setVisible] = useState(false)
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) setVisible(true) },
-      { threshold: 0.1 }
-    )
-    if (ref.current) observer.observe(ref.current)
-    return () => observer.disconnect()
-  }, [])
-
-  return (
-    <section id="articles" ref={ref} className="py-24 px-6 border-t border-white/5">
-      <div className="max-w-5xl mx-auto" dir="rtl">
-        <div className={`mb-12 transition-all duration-700 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-          <span className="text-[#3ecf5c] text-sm font-medium mb-2 block">المدوّنة</span>
-          <h2 className="font-bold text-[#ebebeb]" style={{ fontSize: 'clamp(28px, 3vw, 42px)' }}>
-            آخر المقالات
-          </h2>
-        </div>
-
-        <div className="flex flex-col">
-          {articles.map((article, i) => (
-            <a
-              key={article}
-              href="#"
-              className={`group flex items-center justify-between py-5 border-b border-white/5 hover:bg-white/2 transition-all duration-700 ${
-                visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
-              }`}
-              style={{ transitionDelay: `${i * 80}ms` }}
-            >
-              <div className="flex items-center gap-4">
-                <span className="text-[#333] text-sm font-mono">
-                  {String(i + 1).padStart(2, '0')}
-                </span>
-                <h3 className="text-[#d9d9d9] group-hover:text-[#ebebeb] transition-colors" style={{ fontSize: 'clamp(14px, 1.2vw, 17px)' }}>
-                  {article}
-                </h3>
-              </div>
-              <span className="text-[#555] group-hover:text-[#888] transition-colors text-lg flex-shrink-0 mr-4">←</span>
-            </a>
-          ))}
-        </div>
-
-        <div className="mt-10 text-center">
-          <a
-            href="#"
-            className="inline-block px-7 py-3 rounded-full bg-white/5 border border-white/10 text-[#d9d9d9] text-sm hover:bg-white/10 transition-all"
-          >
-            عرض جميع المقالات ←
-          </a>
-        </div>
-      </div>
-    </section>
-  )
-}
-
-// ── CTA SECTION ───────────────────────────────────────────────────────
-function CTASection() {
-  return (
-    <section id="contact" className="py-28 px-6">
-      <div className="max-w-4xl mx-auto text-center relative" dir="rtl">
-        {/* Glow */}
-        <div className="absolute inset-0 bg-[#2151ff]/5 rounded-3xl blur-[80px] pointer-events-none" />
-
-        <div className="relative bg-[#171717] border border-white/8 rounded-3xl p-12 sm:p-16">
-          {/* Accent line */}
-          <div className="w-16 h-1 bg-gradient-to-l from-[#2151ff] to-[#ff7b0f] rounded-full mx-auto mb-8" />
-
-          <h2
-            className="font-bold text-[#ebebeb] mb-4"
-            style={{ fontSize: 'clamp(28px, 3.5vw, 48px)' }}
-          >
-            تبحث عن خدماتي؟
-          </h2>
-          <p className="text-[#888] mb-10 text-base leading-relaxed">
-            سواء كنت تبحث عن استشارة تأسيسيّة أو شراكة استراتيجيّة — أنا هنا.
-          </p>
-
-          <div className="flex flex-wrap justify-center gap-4">
-            <a
-              href="mailto:hala@moedesigns.io"
-              className="px-8 py-3.5 rounded-full bg-[#2151ff] text-white font-medium hover:opacity-90 hover:shadow-[0_0_30px_rgba(33,81,255,0.4)] transition-all duration-200"
-            >
-              تواصل معي
-            </a>
-            <a
-              href="#services"
-              className="px-8 py-3.5 rounded-full bg-white/5 border border-white/10 text-[#ebebeb] hover:bg-white/10 transition-all"
-            >
-              الخدمات والباقات
-            </a>
-          </div>
-
-          <p className="mt-8 text-[#555] text-sm">
-            أو راسلني على{' '}
-            <a href="mailto:hala@moedesigns.io" className="text-[#888] hover:text-[#ebebeb] transition-colors underline decoration-dotted">
-              hala@moedesigns.io
-            </a>
-          </p>
-        </div>
-      </div>
-    </section>
-  )
-}
-
-// ── FOOTER ───────────────────────────────────────────────────────────
-function Footer() {
-  return (
-    <footer className="border-t border-white/5 py-12 px-6">
-      <div className="max-w-7xl mx-auto" dir="rtl">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-10 mb-10">
-          {/* Brand */}
-          <div>
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 rounded-lg bg-[#2151ff] flex items-center justify-center text-white font-bold text-xs">م</div>
-              <span className="text-[#ebebeb] font-semibold">محمّد الحكيم</span>
-            </div>
-            <p className="text-[#555] text-sm leading-relaxed">
-              مستشار في بيع الخبرات وتأسيس المشاريع الرقميّة.
-              <br />بالي / دبي
-            </p>
-          </div>
-
-          {/* Links */}
-          <div>
-            <h4 className="text-[#888] text-xs font-medium mb-4 uppercase tracking-wider">روابط سريعة</h4>
-            <div className="flex flex-col gap-2">
-              {['المقالات', 'الأعمال', 'الخدمات', 'المنتجات', 'البودكاست'].map(link => (
-                <a key={link} href="#" className="text-[#555] hover:text-[#d9d9d9] text-sm transition-colors">
-                  {link}
-                </a>
               ))}
             </div>
+            <a href="#" style={{ display:'inline-block', marginTop:28, fontSize:13, color:'#888', borderBottom:'1px solid rgba(255,255,255,0.1)', paddingBottom:2, transition:'color 0.2s' }}>
+              تصميم محمّد الحكيم →
+            </a>
           </div>
+          {/* Right: newsletter preview */}
+          <div style={{
+            background:'linear-gradient(145deg,#1a1a2e,#12121e)',
+            borderRadius:12,
+            padding:'28px 24px',
+            border:'1px solid rgba(255,255,255,0.06)',
+          }}>
+            <div style={{ display:'flex', gap:8, marginBottom:20 }}>
+              {['🟠','🟣','🔵'].map((c,i) => (
+                <span key={i} style={{ padding:'4px 12px', borderRadius:20, background:'rgba(255,255,255,0.06)', fontSize:11, color:'#888' }}>
+                  {c} نشرة {i+1}
+                </span>
+              ))}
+            </div>
+            <div style={{ height:80, background:'rgba(255,255,255,0.03)', borderRadius:8, marginBottom:16 }} />
+            <div style={{ height:12, background:'rgba(255,255,255,0.04)', borderRadius:4, marginBottom:8, width:'80%' }} />
+            <div style={{ height:12, background:'rgba(255,255,255,0.04)', borderRadius:4, marginBottom:16, width:'60%' }} />
+            <div style={{ display:'flex', gap:8 }}>
+              <input placeholder="بريدك الإلكتروني" style={{
+                flex:1, background:'rgba(255,255,255,0.06)', border:'1px solid rgba(255,255,255,0.08)',
+                borderRadius:8, padding:'10px 14px', fontSize:13, color:'#d9d9d9',
+                fontFamily:'inherit', outline:'none', direction:'rtl',
+              }} />
+              <button style={{
+                background:'#2151ff', border:'none', borderRadius:8,
+                padding:'10px 18px', fontSize:13, fontWeight:500, color:'#fff',
+                cursor:'pointer', fontFamily:'inherit', whiteSpace:'nowrap',
+              }}>اشترك</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
 
-          {/* Newsletter */}
+/* ══════════════════════════════════════════════════════
+   PRODUCTS CAROUSEL
+══════════════════════════════════════════════════════ */
+function Products() {
+  const [idx, setIdx] = useState(0)
+  const max = products.length - 3
+
+  return (
+    <section style={{ padding:'60px 0' }} dir="rtl">
+      <div className="container">
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:28 }}>
+          <div style={{ display:'flex', gap:8 }}>
+            <CarouselBtn dir="right" onClick={() => setIdx(i => Math.max(0,i-1))} disabled={idx===0} />
+            <CarouselBtn dir="left"  onClick={() => setIdx(i => Math.min(max,i+1))} disabled={idx>=max} />
+          </div>
+          <h2 style={{ fontSize:18, fontWeight:400, color:'#ededed' }}>أحدث المنتجات</h2>
+        </div>
+
+        <div style={{ overflow:'hidden' }}>
+          <div style={{
+            display:'flex', gap:16,
+            transform:`translateX(${idx * (33.33+.5)}%)`,
+            transition:'transform 0.4s cubic-bezier(0.4,0,0.2,1)',
+          }}>
+            {products.map((p,i) => <ProductCard key={i} {...p} />)}
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function ProductCard({ type, title, price, emoji, bg }: typeof products[0]) {
+  const [hov, setHov] = useState(false)
+  return (
+    <div
+      onMouseEnter={()=>setHov(true)}
+      onMouseLeave={()=>setHov(false)}
+      style={{
+        flexShrink:0,
+        width:'calc(33.33% - 11px)',
+        borderRadius:16,
+        overflow:'hidden',
+        border:'1px solid rgba(255,255,255,0.06)',
+        cursor:'pointer',
+        transform: hov ? 'translateY(-4px)' : 'none',
+        transition:'transform 0.25s ease',
+        background:'#161616',
+      }}
+    >
+      {/* Thumbnail */}
+      <div style={{
+        height:140, background: `linear-gradient(145deg, ${bg} 0%, #0a0a0a 100%)`,
+        display:'flex', alignItems:'center', justifyContent:'center',
+        fontSize:36,
+      }}>{emoji}</div>
+      {/* Info */}
+      <div style={{ padding:'16px 18px 20px' }}>
+        <span style={{
+          fontSize:10, color:'#888', background:'rgba(255,255,255,0.05)',
+          borderRadius:20, padding:'3px 10px', display:'inline-block', marginBottom:10,
+        }}>{type}</span>
+        <p style={{ fontSize:14, color:'#ededed', lineHeight:1.5, marginBottom:14 }}>{title}</p>
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+          <span style={{ fontSize:13, color:'#888', opacity: hov ? 1 : 0.5, transition:'opacity 0.2s' }}>شراء →</span>
+          <span style={{ fontSize:16, fontWeight:600, color:'#ededed' }}>{price}</span>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/* ══════════════════════════════════════════════════════
+   SERVICES PILLS
+══════════════════════════════════════════════════════ */
+function ServicesPills() {
+  const doubled = [...services, ...services]
+  return (
+    <section style={{ padding:'32px 0', overflow:'hidden' }} dir="rtl">
+      <div style={{ display:'flex', gap:12, width:'max-content' }} className="scroll-ticker">
+        {doubled.map((s,i) => (
+          <div key={i} style={{
+            padding:'10px 20px', borderRadius:20,
+            border:'1px solid rgba(255,255,255,0.08)',
+            background:'rgba(255,255,255,0.03)',
+            fontSize:13, color:'#d9d9d9', whiteSpace:'nowrap',
+            cursor:'pointer',
+          }}>{s}</div>
+        ))}
+      </div>
+    </section>
+  )
+}
+
+/* ══════════════════════════════════════════════════════
+   ARTICLES — 2 columns
+══════════════════════════════════════════════════════ */
+function Articles() {
+  const ref = useRef<HTMLDivElement>(null)
+  const [vis, setVis] = useState(false)
+  useEffect(() => {
+    const ob = new IntersectionObserver(([e]) => { if(e.isIntersecting) setVis(true) }, { threshold:0.1 })
+    if(ref.current) ob.observe(ref.current)
+    return () => ob.disconnect()
+  }, [])
+
+  // Split into 2 columns
+  const withThumb  = articles.filter(a => a.thumb)
+  const noThumb    = articles.filter(a => !a.thumb)
+
+  return (
+    <section ref={ref} style={{ padding:'60px 0' }} dir="rtl">
+      <div className="container">
+        {/* Header */}
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:32 }}>
+          <div style={{ display:'flex', gap:8 }}>
+            <CarouselBtn dir="right" onClick={()=>{}} disabled={false} />
+            <CarouselBtn dir="left"  onClick={()=>{}} disabled={false} />
+          </div>
+          <h2 style={{ fontSize:18, fontWeight:400, color:'#ededed' }}>آخر المقالات ←</h2>
+        </div>
+
+        {/* 2 column grid */}
+        <div style={{
+          background:'#171717',
+          borderRadius:16,
+          overflow:'hidden',
+          display:'grid',
+          gridTemplateColumns:'1fr 1fr',
+          opacity: vis ? 1 : 0,
+          transform: vis ? 'none' : 'translateY(24px)',
+          transition:'opacity 0.7s, transform 0.7s',
+        }}>
+          {/* RIGHT column: with thumbs */}
+          <div style={{ borderLeft:'1px solid rgba(255,255,255,0.05)' }}>
+            {withThumb.map((a,i) => (
+              <ArticleRow key={i} title={a.title} thumb={a.thumb} border={i>0} />
+            ))}
+          </div>
+          {/* LEFT column: text only */}
           <div>
-            <h4 className="text-[#888] text-xs font-medium mb-4 uppercase tracking-wider">النشرة البريديّة</h4>
-            <p className="text-[#555] text-sm mb-4">تواصل مع متابعينك مباشرة</p>
-            <form className="flex gap-2" onSubmit={(e) => e.preventDefault()}>
-              <input
-                type="email"
-                placeholder="بريدك الإلكتروني"
-                className="flex-1 bg-[#212121] border border-white/8 rounded-xl px-4 py-2.5 text-sm text-[#d9d9d9] placeholder:text-[#444] focus:outline-none focus:border-[#2151ff]/40 transition-colors"
-                dir="rtl"
-              />
-              <button
-                type="submit"
-                className="px-4 py-2.5 rounded-xl bg-[#2151ff] text-white text-sm font-medium hover:opacity-90 transition-opacity flex-shrink-0"
+            {noThumb.map((a,i) => (
+              <ArticleRow key={i} title={a.title} thumb="" border={i>0} />
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function ArticleRow({ title, thumb, border }: { title:string; thumb:string; border:boolean }) {
+  const [hov, setHov] = useState(false)
+  return (
+    <div
+      onMouseEnter={()=>setHov(true)}
+      onMouseLeave={()=>setHov(false)}
+      style={{
+        display:'flex', alignItems:'center', justifyContent:'space-between',
+        padding:'20px 24px',
+        borderTop: border ? '1px solid rgba(255,255,255,0.05)' : 'none',
+        gap:16,
+        cursor:'pointer',
+        background: hov ? 'rgba(255,255,255,0.02)' : 'transparent',
+        transition:'background 0.2s',
+      }}
+    >
+      <p style={{ fontSize:14, color:'#d9d9d9', lineHeight:1.5, flex:1 }}>{title}</p>
+      {thumb && (
+        <div style={{
+          width:48, height:48, borderRadius:8, flexShrink:0,
+          background:'rgba(255,255,255,0.06)',
+          display:'flex', alignItems:'center', justifyContent:'center',
+          fontSize:20,
+        }}>{thumb}</div>
+      )}
+    </div>
+  )
+}
+
+/* ══════════════════════════════════════════════════════
+   PODCAST / VIDEO
+══════════════════════════════════════════════════════ */
+function Podcast() {
+  return (
+    <section style={{ padding:'40px 0' }} dir="rtl">
+      <div className="container">
+        <div style={{
+          background:'#171717', borderRadius:16,
+          padding:'36px 40px',
+          display:'flex', alignItems:'center', justifyContent:'space-between',
+          flexWrap:'wrap', gap:24,
+        }}>
+          <div>
+            <span style={{ fontSize:12, color:'rgba(255,255,255,0.25)', letterSpacing:1, display:'block', marginBottom:8 }}>البودكاست</span>
+            <h3 style={{ fontSize:'clamp(18px,2vw,26px)', fontWeight:500, color:'#ededed', marginBottom:4 }}>
+              استمع للبودكاست
+            </h3>
+            <p style={{ fontSize:14, color:'#888' }}>حلقات أسبوعيّة في بيع الخبرات والأعمال</p>
+          </div>
+          <div style={{ display:'flex', gap:10, flexWrap:'wrap' }}>
+            {[
+              { label:'YouTube', color:'#ff0000', icon:'▶' },
+              { label:'Spotify', color:'#1DB954', icon:'♪' },
+              { label:'Apple',   color:'#fc3c44', icon:'🎙' },
+            ].map(p => (
+              <a key={p.label} href="#" style={{
+                display:'flex', alignItems:'center', gap:6,
+                padding:'8px 16px', borderRadius:20,
+                border:`1px solid ${p.color}33`,
+                background:`${p.color}11`,
+                fontSize:13, color:'#ededed',
+                transition:'background 0.2s',
+              }}
+              onMouseEnter={e=>e.currentTarget.style.background=`${p.color}22`}
+              onMouseLeave={e=>e.currentTarget.style.background=`${p.color}11`}
               >
-                انضم
-              </button>
-            </form>
+                <span style={{ color:p.color }}>{p.icon}</span>
+                {p.label}
+              </a>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+/* ══════════════════════════════════════════════════════
+   CTA SECTION — "تبحث عن خدماتي؟"
+══════════════════════════════════════════════════════ */
+function CTASection() {
+  return (
+    <section style={{ padding:'40px 0' }} dir="rtl">
+      <div className="container">
+        <div style={{
+          background:'#171717', borderRadius:16,
+          padding:'44px 48px',
+          textAlign:'right',
+        }}>
+          <h2 style={{ fontSize:'clamp(22px,2.5vw,36px)', fontWeight:500, color:'#ededed', marginBottom:16 }}>
+            تبحث عن خدماتي؟
+          </h2>
+          <p style={{ fontSize:15, color:'#888', lineHeight:1.8, marginBottom:32, maxWidth:560 }}>
+            ومستعد أن تستثمر فيه وتعمل مع الأفضل؟ فرق شاسع ما بين بناء المشروع مع مرشد خبير وبين العمل وحدك
+          </p>
+          <div style={{ display:'flex', gap:12, flexWrap:'wrap' }}>
+            <a href="#" style={{
+              padding:'12px 28px', borderRadius:20,
+              background:'rgba(255,255,255,0.06)', border:'1px solid rgba(255,255,255,0.1)',
+              fontSize:14, color:'#ededed', transition:'background 0.2s',
+            }}>تواصل معي</a>
+            <a href="#" style={{
+              padding:'12px 28px', borderRadius:20,
+              background:'rgba(255,255,255,0.06)', border:'1px solid rgba(255,255,255,0.1)',
+              fontSize:14, color:'#ededed', transition:'background 0.2s',
+            }}>الخدمات والباقات</a>
+            <a href="#" style={{
+              padding:'12px 28px', borderRadius:20,
+              background:'rgba(255,255,255,0.06)', border:'1px solid rgba(255,255,255,0.1)',
+              fontSize:14, color:'#ededed', transition:'background 0.2s',
+            }}>جميع الحلقات</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+/* ══════════════════════════════════════════════════════
+   FOOTER / NEWSLETTER
+══════════════════════════════════════════════════════ */
+function Footer() {
+  return (
+    <footer style={{ paddingTop:40, paddingBottom:48 }} dir="rtl">
+      <div className="container">
+        {/* Newsletter */}
+        <div style={{ marginBottom:48, textAlign:'right' }}>
+          <h3 style={{ fontSize:'clamp(20px,2vw,28px)', fontWeight:500, color:'#ededed', lineHeight:1.4, marginBottom:28 }}>
+            أحدث مقالاتي<br />مباشرة في بريدك الالكتروني
+          </h3>
+          <div style={{ display:'flex', gap:10, maxWidth:480 }}>
+            <button style={{
+              background:'#2151ff', border:'none', borderRadius:10,
+              padding:'12px 24px', fontSize:14, fontWeight:500,
+              color:'#fff', cursor:'pointer', fontFamily:'inherit', flexShrink:0,
+            }}>اشترك</button>
+            <input
+              type="email"
+              placeholder="hala@moedesigns.io"
+              style={{
+                flex:1, background:'rgba(255,255,255,0.05)',
+                border:'1px solid rgba(255,255,255,0.08)',
+                borderRadius:10, padding:'12px 16px',
+                fontSize:14, color:'#d9d9d9',
+                fontFamily:'inherit', outline:'none', direction:'rtl',
+              }}
+            />
           </div>
         </div>
 
         {/* Bottom bar */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-6 border-t border-white/5">
-          <p className="text-[#444] text-xs">
-            © {new Date().getFullYear()} محمّد الحكيم · جميع الحقوق محفوظة
-          </p>
-          <a
-            href="https://nashra.io"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-[#444] hover:text-[#888] text-xs transition-colors"
-          >
-            مدعوم بـ Nashra.ai ↗
-          </a>
+        <div style={{
+          borderTop:'1px solid rgba(255,255,255,0.06)',
+          paddingTop:24,
+          display:'flex', alignItems:'center', justifyContent:'center', flexWrap:'wrap',
+          gap:8, fontSize:14, color:'rgba(255,255,255,0.25)',
+        }}>
+          {['Bali / Dubai','hala@moedesigns.io','نشرة','احجز استشارة 💤'].map((item, i, arr) => (
+            <span key={item} style={{ display:'flex', alignItems:'center', gap:8 }}>
+              <a href="#" style={{ color:'rgba(255,255,255,0.25)', transition:'color 0.2s' }}
+              onMouseEnter={e=>e.currentTarget.style.color='rgba(255,255,255,0.6)'}
+              onMouseLeave={e=>e.currentTarget.style.color='rgba(255,255,255,0.25)'}
+              >{item}</a>
+              {i < arr.length-1 && <span>·</span>}
+            </span>
+          ))}
         </div>
       </div>
     </footer>
   )
 }
 
-// ── PAGE ──────────────────────────────────────────────────────────────
-export default function Home() {
+/* ══════════════════════════════════════════════════════
+   PAGE
+══════════════════════════════════════════════════════ */
+export default function Page() {
   return (
-    <div className="min-h-screen bg-[#0f0f0f] font-arabic" dir="rtl">
+    <div style={{ background:'#0f0f0f', minHeight:'100vh' }} dir="rtl">
       <Navbar />
       <Hero />
-      <Stats />
       <Portfolio />
+      <Stats />
       <Clients />
+      <NashraSection />
       <Products />
+      <ServicesPills />
       <Articles />
+      <Podcast />
       <CTASection />
       <Footer />
     </div>
