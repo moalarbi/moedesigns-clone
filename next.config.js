@@ -5,6 +5,7 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  outputFileTracing: false,
 };
 
 module.exports = nextConfig;
