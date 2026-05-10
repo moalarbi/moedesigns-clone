@@ -142,10 +142,12 @@ function NavbarInner() {
 
         {/* RTL right side: avatar + nav */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
-          <div style={{ width: 32, height: 32, borderRadius: '50%', overflow: 'hidden', background: C.surface, flexShrink: 0 }}>
+          <a href="/" style={{ flexShrink: 0, display: 'block',
+            width: 32, height: 32, borderRadius: '50%', overflow: 'hidden',
+            background: C.surface }}>
             <Image src="/images/avatar.png" alt="avatar" width={32} height={32}
               style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-          </div>
+          </a>
           {[
             { label: 'المنتجات', href: '/products', active: true },
             { label: 'الخدمات',  href: '#' },
