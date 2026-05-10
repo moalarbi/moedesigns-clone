@@ -208,7 +208,7 @@ function Navbar() {
           {/* Nav links */}
           {[
             { label: 'المنتجات', href: '/products' },
-            { label: 'الخدمات',  href: '#' },
+            { label: 'الخدمات',  href: '/services' },
             { label: 'الأعمال',  href: '#' },
             { label: 'المقالات', href: '#' },
           ].map(({ label, href }) => {

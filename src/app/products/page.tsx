@@ -150,7 +150,7 @@ function NavbarInner() {
           </a>
           {[
             { label: 'المنتجات', href: '/products', active: true },
-            { label: 'الخدمات',  href: '#' },
+            { label: 'الخدمات',  href: '/services' },
             { label: 'الأعمال',  href: '#' },
             { label: 'المقالات', href: '#' },
           ].map(({ label, href, active }) => {
