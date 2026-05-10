@@ -1,821 +1,833 @@
-'use client'
-import { useState, useEffect, useRef } from 'react'
+'use client';
+import { useState, useEffect, useRef } from 'react';
+import Image from 'next/image';
 
-/* ══════════════════════════════════════════════════════
-   DATA  —  exact text from moedesigns.io
-══════════════════════════════════════════════════════ */
+/* ─── DESIGN TOKENS ─────────────────────────────── */
+const T = {
+  bg: '#0f0f0f',
+  card: '#171717',
+  card2: '#212121',
+  text1: '#ededed',
+  text2: '#d9d9d9',
+  text3: '#c1c1c1',
+  muted: '#888',
+  border: 'rgba(255,255,255,0.08)',
+  green: '#00c763',
+  blue: '#2151ff',
+  orange: '#ff7b0f',
+  orangeDim: '#2e1e16',
+};
+
+/* ─── DATA ──────────────────────────────────────── */
 const portfolioItems = [
-  { id:1, title:'Luniva',  cat:'موقع تجاري',      bg:'#7c5a3e', accent:'#a8724a' },
-  { id:2, title:'شارك',    cat:'منصّة تدريبيّة',   bg:'#3d5a3e', accent:'#4e7a50' },
-  { id:3, title:'برند',    cat:'هويّة بصريّة',     bg:'#4a3d5a', accent:'#6a5a7a' },
-  { id:4, title:'نشرة',    cat:'منصّة SaaS',       bg:'#3a4d5a', accent:'#4a6d7a' },
-  { id:5, title:'أكاديمية','cat':'منصّة تدريبيّة', bg:'#5a3d3a', accent:'#7a5550' },
-  { id:6, title:'استشارة', cat:'موقع تجاري',       bg:'#3d4a3a', accent:'#556a52' },
-]
+  { name: 'Luniva', type: 'موقع تجاري', img: '/images/portfolio-luniva.png', bg: '#c4956a' },
+  { name: 'شارك - Coworking', type: 'موقع تجاري', img: '/images/portfolio-sharak.png', bg: '#2a2a2a' },
+  { name: 'منيرة | الاحتراق الوظيفي', type: 'منصّة تدريبيّة', img: '/images/portfolio-muneera.png', bg: '#1a1a2e' },
+  { name: 'ثرى للعقار', type: 'موقع تجاري', img: '/images/portfolio-thra.png', bg: '#1e2a1e' },
+  { name: 'حمد راشد الشامسي', type: 'موقع شخصي', img: '/images/portfolio-hamad.png', bg: '#1a1a1a' },
+  { name: 'CX Hub Saudi', type: 'موقع تجاري', img: '/images/portfolio-cxhub.png', bg: '#0d1117' },
+];
+
+const clientLogos = [
+  'wfrah', 'McKinsey & Company', 'Mindvalley', 'رصف', 'Klive', 'فنك',
+  'MIDDLE CAIRO ASSOCIATION', 'Mastercard', 'Google', 'Amazon',
+];
 
 const products = [
-  { type:'دورة مسجّلة', title:'المنهجيّة في الكتابة الإعلانيّة',   price:'$249', emoji:'✍️', bg:'#1a1830' },
-  { type:'دورة رقميّة', title:'دورة تصميم وبناء المواقع',            price:'$199', emoji:'🖥️', bg:'#0f1f18' },
-  { type:'كتيّب رقمي',  title:'كتيّب استراتيجيّة البراند',          price:'$69',  emoji:'📖', bg:'#1e1408' },
-  { type:'ورشة',        title:'ورشة بيع الخدمات الأغلى ثمناً',     price:'$35',  emoji:'🎤', bg:'#0d1520' },
-]
+  { type: 'دورة مسجّلة', title: 'المنهجيّة "العلميّة" في الكتابة الإعلانيّة', price: '$249', img: '/images/portfolio-thra.png' },
+  { type: 'دورة رقميّة مسجّلة', title: 'دورة تصميم وبناء المواقع', price: '$199', img: '/images/portfolio-luniva.png' },
+  { type: 'كتيّب رقمي تفاعلي', title: 'كتيّب استراتيجيّة البراند الشخصي', price: '$69', img: '/images/portfolio-sharak.png' },
+  { type: 'دورة مسجّلة', title: 'أساسيات بناء وتسويق الدورات الرقمية', price: '$199', img: '/images/portfolio-muneera.png' },
+  { type: 'ورشة مسجّلة', title: 'ورشة بناء مشروع استشاري من الصفر', price: '$149', img: '/images/portfolio-cxhub.png' },
+];
 
-const services = [
-  'البيع والتسعير',
-  'السوشال ميديا والإعلام',
-  'التسويق والتوسّع',
-  'الاستراتيجيّة والتمركز',
-  'بناء المشروع والمنتجات',
-]
+const servicesPills = [
+  'البيع والتسعير', 'السوشال ميديا والإعلام', 'التسويق والتوسّع',
+  'الاستراتيجيّة والتمركز', 'بناء المشروع والمنتجات',
+];
 
 const articles = [
-  { title:'منهجيّتي لبيع الخدمات الأغلى | Hight ticket',                                  thumb:'' },
-  { title:'٤ قِيَم. كُل أصحاب البراندات الناجحة كانت عندهم',                               thumb:'👤' },
-  { title:'تقرير: هل ما زال بيع الدورات مشروع مُربح؟',                                    thumb:'' },
-  { title:'٣ أسئلة قبل أن أبدأ بأي مشروع',                                                thumb:'📕' },
-  { title:'درست حَملات أفضل من يبيعون المنتجات الرقميّة. اتّضح أن لديهم سر.',             thumb:'' },
-  { title:'التخصّص يحميك من تجاوزاتك الفكريّة',                                           thumb:'🍴' },
-  { title:'لماذا أفضّل التخصّص في المُشكلة وليس في التكنيك (الحِرفة)؟',                   thumb:'' },
-  { title:'٤ تخصّصات استشاريّة ستحقق الملايين بحلول ٢٠٢٨',                               thumb:'📈' },
-]
+  { title: '٤ قِيَم. كُل أصحاب البراندات الناجحة كانت عندهم', hasThumb: true, img: '/images/portfolio-hamad.png' },
+  { title: 'منهجيّتي لبيع الخدمات الأغلى | Hight ticket', hasThumb: false },
+  { title: 'تقرير: هل ما زال بيع الدورات مشروع مُربح؟', hasThumb: true, img: '/images/portfolio-thra.png' },
+  { title: '٣ أسئلة قبل أن أبدأ بأي مشروع', hasThumb: false },
+  { title: 'درست حَملات أفضل من يبيعون المنتجات الرقميّة. اتّضح أن لديهم سر..', hasThumb: true, img: '/images/portfolio-luniva.png' },
+  { title: 'التخصّص يحميك من تحيّزاتك الفكريّة', hasThumb: false },
+  { title: 'لماذا أفضّل التخصّص في المُشكلة وليس في التكنيك (الحِرفة)؟', hasThumb: false },
+  { title: '٤ تخصّصات استشاريّة ستحقق الملايين بحلول ٢٠٢٨', hasThumb: true, img: '/images/portfolio-muneera.png' },
+];
 
-const clients = ['Wfrah','McKinsey & Company','Mindvalley','RASF','Salla','Zid','Foodics','Almosafer']
+/* ─── HELPERS ───────────────────────────────────── */
+function Dot({ color = '#00c763' }: { color?: string }) {
+  return (
+    <span style={{
+      display: 'inline-block', width: 7, height: 7,
+      borderRadius: '50%', background: color, flexShrink: 0,
+    }} />
+  );
+}
 
-/* ══════════════════════════════════════════════════════
-   NAVBAR
-══════════════════════════════════════════════════════ */
+function DotsMenu() {
+  return (
+    <span style={{ fontSize: 14, letterSpacing: 3, color: T.muted, lineHeight: 1 }}>···</span>
+  );
+}
+
+function SectionHeading({ children, leftBtn }: { children: string; leftBtn?: React.ReactNode }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
+      {leftBtn || <span />}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+        <h2 style={{ fontSize: 18, fontWeight: 500, color: T.text1, margin: 0 }}>{children}</h2>
+        <span style={{ fontSize: 18, color: T.text1 }}>←</span>
+      </div>
+    </div>
+  );
+}
+
+/* ─── NAVBAR ────────────────────────────────────── */
 function Navbar() {
-  const [scrolled, setScrolled] = useState(false)
-  const [menuOpen, setMenuOpen] = useState(false)
-
+  const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
-    const fn = () => setScrolled(window.scrollY > 20)
-    window.addEventListener('scroll', fn, { passive:true })
-    return () => window.removeEventListener('scroll', fn)
-  }, [])
+    const onScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   return (
     <nav style={{
-      position:'fixed', top:0, right:0, left:0, zIndex:50,
-      transition:'background 0.3s, border-color 0.3s',
-      background: scrolled ? 'rgba(15,15,15,0.92)' : 'transparent',
-      backdropFilter: scrolled ? 'blur(12px)' : 'none',
-      borderBottom: scrolled ? '1px solid rgba(255,255,255,0.06)' : '1px solid transparent',
+      position: 'fixed', top: 0, right: 0, left: 0, zIndex: 100,
+      height: 68,
+      background: scrolled ? 'rgba(15,15,15,0.88)' : 'transparent',
+      backdropFilter: scrolled ? 'blur(14px)' : 'none',
+      transition: 'background 0.3s ease, backdrop-filter 0.3s ease',
     }}>
-      <div className="container" style={{ display:'flex', alignItems:'center', justifyContent:'space-between', height:68, direction:'rtl' }}>
-
-        {/* RIGHT: avatar + nav links + dots */}
-        <div style={{ display:'flex', alignItems:'center', gap:32 }}>
-          {/* Avatar */}
-          <div style={{
-            width:36, height:36, borderRadius:'50%',
-            background:'linear-gradient(135deg,#555,#333)',
-            border:'1.5px solid rgba(255,255,255,0.15)',
-            display:'flex', alignItems:'center', justifyContent:'center',
-            fontSize:14, color:'#aaa', flexShrink:0, overflow:'hidden',
-          }}>م</div>
-
-          {/* Nav links */}
-          <div style={{ display:'flex', gap:28 }} className="hidden-mobile">
-            {['المنتجات','الخدمات','الأعمال','المقالات'].map(l => (
-              <a key={l} href="#" style={{
-                fontSize:16, fontWeight:400, color:'#d9d9d9',
-                transition:'color 0.2s', padding:'4px 0',
-              }}
-              onMouseEnter={e=>(e.currentTarget.style.color='#fff')}
-              onMouseLeave={e=>(e.currentTarget.style.color='#d9d9d9')}
-              >{l}</a>
-            ))}
-          </div>
-
-          {/* Dots menu */}
-          <button
-            onClick={() => setMenuOpen(!menuOpen)}
-            style={{ color:'#d9d9d9', fontSize:20, background:'none', border:'none', cursor:'pointer', letterSpacing:2, lineHeight:1 }}
-          >···</button>
-        </div>
-
-        {/* LEFT: CTA button */}
-        <button style={{
-          fontSize:13, fontWeight:500, color:'#ededed',
-          background:'rgba(255,255,255,0.04)',
-          border:'1px solid rgba(255,255,255,0.12)',
-          borderRadius:20, padding:'8px 18px',
-          cursor:'pointer', display:'flex', alignItems:'center', gap:8,
-          transition:'background 0.2s, border-color 0.2s',
-          fontFamily:'inherit',
-        }}
-        onMouseEnter={e=>{ e.currentTarget.style.background='rgba(255,255,255,0.08)'; }}
-        onMouseLeave={e=>{ e.currentTarget.style.background='rgba(255,255,255,0.04)'; }}
-        >
-          <span style={{ fontSize:12, opacity:.5, letterSpacing:2 }}>···</span>
-          ابدأ باستشارة
-        </button>
-      </div>
-
-      {/* Dropdown */}
-      {menuOpen && (
-        <div style={{
-          position:'absolute', top:68, right:0, left:0,
-          background:'rgba(20,20,20,0.98)', backdropFilter:'blur(16px)',
-          borderBottom:'1px solid rgba(255,255,255,0.06)',
-          padding:'16px 48px 20px',
-        }} dir="rtl">
-          <div style={{ display:'flex', flexWrap:'wrap', gap:24 }}>
-            {['مصادر مجّانيّة','البودكاست','التواصل','الوضع الليّلي'].map(i=>(
-              <a key={i} href="#" style={{ color:'#d9d9d9', fontSize:15, transition:'color 0.2s' }}
-              onMouseEnter={e=>e.currentTarget.style.color='#fff'}
-              onMouseLeave={e=>e.currentTarget.style.color='#d9d9d9'}
-              >{i}</a>
-            ))}
-          </div>
-        </div>
-      )}
-    </nav>
-  )
-}
-
-/* ══════════════════════════════════════════════════════
-   HERO
-══════════════════════════════════════════════════════ */
-function Hero() {
-  return (
-    <section style={{ minHeight:'100vh', display:'flex', flexDirection:'column', justifyContent:'center', paddingTop:100, paddingBottom:64 }} dir="rtl">
-      <div className="container">
-
-        {/* H1 */}
-        <h1 style={{
-          fontSize:'clamp(32px, 4vw, 56px)',
-          fontWeight:500,
-          color:'#ededed',
-          lineHeight:1.3,
-          letterSpacing:'-0.02em',
-          maxWidth:700,
-          marginBottom:64,
-          animation:'fadeUp 0.7s ease forwards',
-        }}>
-          مستشار في بناء المشاريع<br />
-          الاستشاريّة والتدريبيّة.<br />
-          رائد أعمال وكاتب.
-        </h1>
-
-        {/* 3 Cards */}
-        <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:12, maxWidth:900 }}>
-          {/* Card 1 – ابدأ معي / احجز استشارة */}
-          <HeroCard
-            topLabel="ابدأ معي"
-            mainText="احجز استشارة"
-            accent="green"
-            dot={true}
-          />
-          {/* Card 2 – المقالات */}
-          <HeroCard
-            topLabel="المقالات"
-            mainText="١٥٠ مقال في بيع الخبرات"
-            accent="none"
-          />
-          {/* Card 3 – اعمل معي */}
-          <HeroCard
-            topLabel="اعمل معي"
-            mainText="خدماتي والباقات"
-            accent="none"
-          />
-        </div>
-
-        {/* Section label below */}
-        <div style={{ marginTop:80, display:'flex', justifyContent:'flex-end' }}>
-          <span style={{ fontSize:18, color:'#ededed', fontWeight:400 }}>
-            أحدث أعمالي ←
-          </span>
-        </div>
-      </div>
-    </section>
-  )
-}
-
-function HeroCard({ topLabel, mainText, accent, dot }: {
-  topLabel:string; mainText:string; accent:string; dot?:boolean;
-}) {
-  const [hov, setHov] = useState(false)
-  return (
-    <div
-      onMouseEnter={() => setHov(true)}
-      onMouseLeave={() => setHov(false)}
-      style={{
-        background: hov ? '#1e1e1e' : '#161616',
-        border:'1px solid rgba(255,255,255,0.07)',
-        borderRadius:16,
-        padding:'20px 22px 22px',
-        cursor:'pointer',
-        transition:'background 0.25s, transform 0.25s',
-        transform: hov ? 'translateY(-3px)' : 'none',
-        minHeight:120,
-        display:'flex', flexDirection:'column', justifyContent:'space-between',
-      }}
-    >
-      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:16 }}>
-        <p style={{ fontSize:13, fontWeight:400, color:'#d9d9d9', opacity:.7 }}>{topLabel}</p>
-        <div style={{ display:'flex', gap:3 }}>
-          {dot && (
-            <span style={{
-              width:7, height:7, borderRadius:'50%',
-              background:'#00c763', display:'inline-block',
-              boxShadow:'0 0 8px #00c76366',
-            }} className="dot-blink" />
-          )}
-          <span style={{ fontSize:10, color:'rgba(255,255,255,0.15)', letterSpacing:2 }}>···</span>
-        </div>
-      </div>
-      <p style={{ fontSize:18, fontWeight:400, color:'#ededed', lineHeight:1.35 }}>{mainText}</p>
-    </div>
-  )
-}
-
-/* ══════════════════════════════════════════════════════
-   PORTFOLIO CAROUSEL
-══════════════════════════════════════════════════════ */
-function Portfolio() {
-  const [idx, setIdx] = useState(0)
-  const perView = 2
-  const max = portfolioItems.length - perView
-
-  return (
-    <section style={{ paddingBottom:80 }} dir="rtl">
-      <div className="container">
-        {/* Header */}
-        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:28 }}>
-          <div /> {/* spacer */}
-          <h2 style={{ fontSize:18, fontWeight:400, color:'#ededed' }}>أحدث أعمالي ←</h2>
-        </div>
-
-        {/* Arrows */}
-        <div style={{ display:'flex', justifyContent:'flex-start', gap:8, marginBottom:20 }}>
-          <CarouselBtn dir="right" onClick={() => setIdx(i => Math.max(0,i-1))} disabled={idx===0} />
-          <CarouselBtn dir="left"  onClick={() => setIdx(i => Math.min(max,i+1))} disabled={idx>=max} />
-        </div>
-
-        {/* Track */}
-        <div style={{ overflow:'hidden' }}>
-          <div style={{
-            display:'flex', gap:16,
-            transform:`translateX(${idx * (50+1)}%)`,
-            transition:'transform 0.4s cubic-bezier(0.4,0,0.2,1)',
-          }}>
-            {portfolioItems.map(item => (
-              <PortfolioCard key={item.id} {...item} />
-            ))}
-          </div>
-        </div>
-      </div>
-    </section>
-  )
-}
-
-function CarouselBtn({ dir, onClick, disabled }: { dir:'left'|'right'; onClick:()=>void; disabled:boolean }) {
-  return (
-    <button onClick={onClick} disabled={disabled} style={{
-      width:36, height:36, borderRadius:'50%',
-      background:'rgba(255,255,255,0.04)',
-      border:'1px solid rgba(255,255,255,0.1)',
-      color: disabled ? 'rgba(255,255,255,0.2)' : '#d9d9d9',
-      fontSize:16, cursor: disabled ? 'default' : 'pointer',
-      display:'flex', alignItems:'center', justifyContent:'center',
-      transition:'background 0.2s',
-    }}>{dir==='right' ? '→' : '←'}</button>
-  )
-}
-
-function PortfolioCard({ title, cat, bg, accent }: typeof portfolioItems[0]) {
-  const [hov, setHov] = useState(false)
-  return (
-    <div
-      onMouseEnter={()=>setHov(true)}
-      onMouseLeave={()=>setHov(false)}
-      style={{
-        flexShrink:0,
-        width:'calc(50% - 8px)',
-        minHeight:380,
-        borderRadius:20,
-        background:`linear-gradient(145deg, ${bg} 0%, ${accent}88 100%)`,
-        position:'relative', overflow:'hidden',
-        cursor:'pointer',
-        transform: hov ? 'scale(1.01)' : 'scale(1)',
-        transition:'transform 0.3s ease',
-        border:'1px solid rgba(255,255,255,0.06)',
-      }}
-    >
-      {/* Browser mockup */}
       <div style={{
-        margin:'32px 28px 0',
-        background:'#fff',
-        borderRadius:'12px 12px 0 0',
-        overflow:'hidden',
-        height:260,
-        boxShadow:'0 8px 32px rgba(0,0,0,0.4)',
+        maxWidth: 1128, margin: '0 auto', height: '100%',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        padding: '0 24px',
       }}>
-        {/* Browser chrome */}
-        <div style={{ background:'#f0f0f0', padding:'8px 12px', display:'flex', alignItems:'center', gap:6 }}>
-          <span style={{ width:8, height:8, borderRadius:'50%', background:'#ff5f57', display:'inline-block' }} />
-          <span style={{ width:8, height:8, borderRadius:'50%', background:'#ffbe2e', display:'inline-block' }} />
-          <span style={{ width:8, height:8, borderRadius:'50%', background:'#27c840', display:'inline-block' }} />
-          <span style={{ flex:1, background:'#e0e0e0', borderRadius:4, height:14, marginRight:8 }} />
+        {/* RIGHT side (RTL): avatar + nav links + dots */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
+          <div style={{ width: 32, height: 32, borderRadius: '50%', overflow: 'hidden', flexShrink: 0, background: T.card }}>
+            <Image src="/images/avatar.png" alt="محمّد الحكيم" width={32} height={32}
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          </div>
+          {['المنتجات', 'الخدمات', 'الأعمال', 'المقالات'].map(link => (
+            <a key={link} href="#" style={{ fontSize: 16, color: T.text2, textDecoration: 'none', transition: 'color 0.2s' }}
+              onMouseEnter={e => (e.currentTarget.style.color = T.text1)}
+              onMouseLeave={e => (e.currentTarget.style.color = T.text2)}>
+              {link}
+            </a>
+          ))}
+          <DotsMenu />
         </div>
-        {/* Website preview */}
-        <div style={{
-          height:'100%',
-          background:`linear-gradient(160deg, ${bg}cc 0%, #111 100%)`,
-          display:'flex', alignItems:'center', justifyContent:'center',
-        }}>
-          <span style={{ color:'rgba(255,255,255,0.3)', fontSize:32, fontWeight:700 }}>{title}</span>
-        </div>
-      </div>
 
-      {/* Info */}
-      <div style={{ position:'absolute', bottom:0, right:0, left:0, padding:'20px 28px', background:'linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%)' }}>
-        <span style={{ fontSize:10, color:'#d9d9d9', opacity:.7, display:'block', marginBottom:4 }}>{cat}</span>
-        <span style={{ fontSize:16, fontWeight:500, color:'#ededed' }}>{title}</span>
+        {/* LEFT side (RTL): dots + CTA button */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <DotsMenu />
+          <a href="#" style={{
+            display: 'inline-flex', alignItems: 'center', gap: 8,
+            padding: '8px 14px 8px 12px',
+            border: '1.5px solid rgba(255,255,255,0.13)',
+            borderRadius: 10,
+            fontSize: 13, fontWeight: 500, color: T.text1,
+            textDecoration: 'none',
+            background: 'rgba(255,255,255,0.04)',
+            transition: 'background 0.2s',
+          }}
+            onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.08)'; }}
+            onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.04)'; }}>
+            <DotsMenu />
+            <span>ابدأ باستشارة</span>
+          </a>
+        </div>
       </div>
-    </div>
-  )
+    </nav>
+  );
 }
 
-/* ══════════════════════════════════════════════════════
-   STATS — "خلال ٧ سنوات..."
-══════════════════════════════════════════════════════ */
-function Stats() {
-  const ref = useRef<HTMLDivElement>(null)
-  const [vis, setVis] = useState(false)
-  useEffect(() => {
-    const ob = new IntersectionObserver(([e]) => { if(e.isIntersecting) setVis(true) }, { threshold:0.2 })
-    if(ref.current) ob.observe(ref.current)
-    return () => ob.disconnect()
-  }, [])
+/* ─── HERO ──────────────────────────────────────── */
+const heroCards = [
+  { label: 'ابدأ معي', value: 'احجز استشارة', dot: true, dotColor: '#00c763' },
+  { label: 'المقالات', value: '١٥٠ مقال في بيع الخبرات', dot: false },
+  { label: 'اعمل معي', value: 'خدماتي والباقات', dot: false },
+];
+
+function HeroSection() {
+  return (
+    <section style={{
+      minHeight: '100vh',
+      display: 'flex', flexDirection: 'column', justifyContent: 'center',
+      background: T.bg, paddingTop: 68,
+    }}>
+      <div style={{ maxWidth: 1128, margin: '0 auto', width: '100%', padding: '0 24px' }}>
+        {/* H1 — right-aligned in RTL */}
+        <div style={{ display: 'flex', justifyContent: 'flex-start', marginBottom: 32, paddingTop: 60 }}>
+          <h1 style={{
+            fontSize: 28,
+            fontWeight: 500,
+            lineHeight: '36px',
+            letterSpacing: '-0.84px',
+            color: T.text2,
+            maxWidth: 380,
+            margin: 0,
+          }}>
+            مستشار في بناء المشاريع الاستشاريّة والتدريبيّة. رائد أعمال وكاتب.
+          </h1>
+        </div>
+
+        {/* Hero cards */}
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          {heroCards.map((card, i) => (
+            <a key={i} href="#" style={{
+              display: 'flex', flexDirection: 'column', gap: 2,
+              background: T.card, borderRadius: 12,
+              padding: '12px 16px',
+              width: 200, minHeight: 74,
+              textDecoration: 'none',
+              transition: 'background 0.2s',
+              flexShrink: 0,
+            }}
+              onMouseEnter={e => { e.currentTarget.style.background = '#1e1e1e'; }}
+              onMouseLeave={e => { e.currentTarget.style.background = T.card; }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span style={{ fontSize: 13, color: T.text2 }}>{card.label}</span>
+                {card.dot
+                  ? <Dot color={card.dotColor} />
+                  : <span style={{ fontSize: 12, letterSpacing: 3, color: T.muted }}>···</span>}
+              </div>
+              <span style={{ fontSize: 16, color: T.text2 }}>{card.value}</span>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ─── PORTFOLIO ─────────────────────────────────── */
+function PortfolioSection() {
+  const [idx, setIdx] = useState(0);
+  const visible = 2;
+  const cardW = 333;
+  const gap = 16;
+  const max = portfolioItems.length - visible;
 
   return (
-    <section ref={ref} style={{ padding:'40px 0 60px' }} dir="rtl">
-      <div className="container">
+    <section style={{ background: T.bg, padding: '0 0 60px' }}>
+      <div style={{ maxWidth: 1128, margin: '0 auto', padding: '0 24px' }}>
+        <SectionHeading>أحدث أعمالي</SectionHeading>
+        <div style={{ overflow: 'hidden' }}>
+          <div style={{
+            display: 'flex', gap,
+            transform: `translateX(${idx * (cardW + gap)}px)`,
+            transition: 'transform 0.45s cubic-bezier(0.4,0,0.2,1)',
+          }}>
+            {portfolioItems.map((item, i) => (
+              <div key={i} style={{ flexShrink: 0, width: cardW }}>
+                <div style={{
+                  borderRadius: 10, overflow: 'hidden',
+                  background: item.bg,
+                  padding: 12, height: 222,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  position: 'relative',
+                }}>
+                  {/* Browser chrome dots */}
+                  <div style={{
+                    position: 'absolute', top: 10, right: 10,
+                    display: 'flex', gap: 4,
+                  }}>
+                    {[0,1,2].map(d => (
+                      <span key={d} style={{ width: 6, height: 6, borderRadius: '50%', background: 'rgba(255,255,255,0.25)' }} />
+                    ))}
+                  </div>
+                  <Image src={item.img} alt={item.name} width={309} height={190}
+                    style={{ width: '100%', height: '90%', objectFit: 'cover', borderRadius: 4 }} />
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 10, paddingRight: 2, paddingLeft: 2 }}>
+                  <span style={{ fontSize: 10, color: T.text2 }}>{item.type}</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <span style={{ fontSize: 13, fontWeight: 500, color: T.text1 }}>{item.name}</span>
+                    <DotsMenu />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', gap: 8, marginTop: 20, justifyContent: 'flex-end' }}>
+          {[{ arrow: '‹', dir: 1 }, { arrow: '›', dir: -1 }].map(({ arrow, dir }, ai) => (
+            <button key={ai}
+              onClick={() => setIdx(prev => Math.max(0, Math.min(max, prev + dir)))}
+              style={{
+                width: 36, height: 36, borderRadius: '50%',
+                background: 'transparent', border: `1px solid ${T.border}`,
+                color: T.text2, fontSize: 18, cursor: 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                transition: 'background 0.2s, border-color 0.2s',
+              }}
+              onMouseEnter={e => { e.currentTarget.style.background = T.card; }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; }}>
+              {arrow}
+            </button>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ─── STATS ─────────────────────────────────────── */
+function StatPill({ children }: { children: React.ReactNode }) {
+  return (
+    <span style={{
+      display: 'inline-flex', alignItems: 'center',
+      background: 'rgba(255,255,255,0.06)',
+      border: `1px solid rgba(255,255,255,0.12)`,
+      borderRadius: 6, padding: '1px 10px',
+      fontSize: 18, fontWeight: 500, color: T.text1,
+      whiteSpace: 'nowrap',
+    }}>
+      {children}
+    </span>
+  );
+}
+
+function StatsSection() {
+  return (
+    <section style={{ background: T.bg, padding: '0 0 60px' }}>
+      <div style={{ maxWidth: 1128, margin: '0 auto', padding: '0 24px' }}>
         <div style={{
-          background:'#171717',
-          borderRadius:16,
-          padding:'36px 40px',
-          opacity: vis ? 1 : 0,
-          transform: vis ? 'none' : 'translateY(20px)',
-          transition:'opacity 0.7s ease, transform 0.7s ease',
+          background: T.card, borderRadius: 16,
+          padding: 40, maxWidth: 800,
         }}>
           <p style={{
-            fontSize:'clamp(16px, 1.5vw, 20px)',
-            fontWeight:400,
-            color:'#ededed',
-            lineHeight:1.8,
-            textAlign:'right',
+            fontSize: 18, color: T.text3, lineHeight: '32px', margin: '0 0 20px',
+            display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center',
           }}>
-            خلال{' '}
-            <StatNum>٧ سنوات</StatNum>
-            {' '}ساعدت{' '}
-            <StatNum>80+</StatNum>
-            {' '}مؤسّس ليبدأ مشروعه في بيع الخبرات.{' '}
-            عُملائي يشهدون بعائد استثمار يبدأ من{' '}
-            <StatNum>400%</StatNum>
-            {' '}خلال السنة الأولى
+            <span>خلال</span>
+            <StatPill>٧ سنوات</StatPill>
+            <span>ساعدت</span>
+            <StatPill>80+</StatPill>
+            <span>مؤسّس ليبدأ مشروعه في بيع الخبرات. عُملائي يشهدون بعائد استثمار يبدأ من</span>
+            <StatPill>400%</StatPill>
+            <span>خلال السنة الأولى</span>
+          </p>
+          <p style={{ fontSize: 16, color: T.text3, lineHeight: '28px', margin: 0 }}>
+            تشمل{' '}
+            <a href="#" style={{ color: T.text1, textDecoration: 'none', borderBottom: `1px solid ${T.border}` }}>
+              خدماتي
+            </a>
+            {' '}باقات في تأسيس المشروع أو المُساعدة في توسعته. عموماً أساعدك أن تنتقل في بيع الخبرات من هواية ومُقايضة الوقت بالمال إلى شركة من فرد واحد
           </p>
         </div>
       </div>
     </section>
-  )
+  );
 }
 
-function StatNum({ children }: { children:React.ReactNode }) {
-  return <span style={{ color:'#ededed', fontWeight:600 }}>{children}</span>
-}
-
-/* ══════════════════════════════════════════════════════
-   CLIENTS TICKER
-══════════════════════════════════════════════════════ */
-function Clients() {
-  const doubled = [...clients, ...clients]
+/* ─── CLIENTS TICKER ────────────────────────────── */
+function ClientsTicker() {
+  const logos = [...clientLogos, ...clientLogos];
   return (
-    <section style={{ padding:'32px 0', overflow:'hidden', borderTop:'1px solid rgba(255,255,255,0.05)', borderBottom:'1px solid rgba(255,255,255,0.05)' }}>
-      <div style={{ display:'flex', gap:64, width:'max-content' }} className="scroll-ticker">
-        {doubled.map((c,i) => (
-          <span key={i} style={{ fontSize:15, color:'rgba(255,255,255,0.25)', whiteSpace:'nowrap', letterSpacing:.5 }}>{c}</span>
-        ))}
+    <section style={{ background: T.bg, padding: '20px 0 60px', overflow: 'hidden' }}>
+      <div style={{ display: 'flex', overflow: 'hidden' }}>
+        <div className="scroll-ticker" style={{
+          display: 'flex', gap: 48, flexShrink: 0,
+          alignItems: 'center', whiteSpace: 'nowrap',
+        }}>
+          {logos.map((logo, i) => (
+            <span key={i} style={{
+              fontSize: 15, fontWeight: 500,
+              color: 'rgba(255,255,255,0.22)',
+              flexShrink: 0, letterSpacing: 0.3,
+            }}>{logo}</span>
+          ))}
+        </div>
       </div>
     </section>
-  )
+  );
 }
 
-/* ══════════════════════════════════════════════════════
-   NASHRA SECTION
-══════════════════════════════════════════════════════ */
+/* ─── NASHRA SECTION ────────────────────────────── */
 function NashraSection() {
   return (
-    <section style={{ padding:'60px 0' }} dir="rtl">
-      <div className="container">
+    <section style={{ background: T.bg, padding: '0 0 60px' }}>
+      <div style={{ maxWidth: 1128, margin: '0 auto', padding: '0 24px' }}>
         <div style={{
-          background:'#171717',
-          borderRadius:16,
-          padding:'40px 44px',
-          display:'grid',
-          gridTemplateColumns:'1fr 1fr',
-          gap:48,
-          alignItems:'center',
+          background: T.card, borderRadius: 16,
+          overflow: 'hidden',
+          display: 'grid', gridTemplateColumns: '1fr 1fr',
+          minHeight: 340,
         }}>
-          {/* Left: content */}
-          <div>
-            <span style={{ fontSize:12, color:'rgba(255,255,255,0.3)', letterSpacing:1, textTransform:'uppercase', display:'block', marginBottom:12 }}>Nashra.ai</span>
-            <h3 style={{ fontSize:'clamp(22px,2.5vw,32px)', fontWeight:500, color:'#ededed', lineHeight:1.35, marginBottom:16 }}>
-              نشرتك البريديّة + مدوّنتك
-            </h3>
-            <p style={{ fontSize:15, color:'#888', marginBottom:28 }}>تواصل مع متابعينك مباشرة</p>
-            <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
-              {['الاشتراك والتفاصيل','تدعم الكتابة بالعربي','صفحات هبوط'].map(f => (
-                <div key={f} style={{ display:'flex', alignItems:'center', gap:10 }}>
-                  <span style={{ color:'#00c763', fontSize:14 }}>✓</span>
-                  <span style={{ fontSize:14, color:'#d9d9d9' }}>{f}</span>
+          {/* Right col: content (RTL first) */}
+          <div style={{ padding: '40px 32px', display: 'flex', flexDirection: 'column', gap: 20 }}>
+            {/* Badge */}
+            <div style={{
+              display: 'inline-flex', alignItems: 'center', gap: 6,
+              background: T.orangeDim, borderRadius: 8, padding: '4px 10px',
+              alignSelf: 'flex-start',
+            }}>
+              <span style={{ fontSize: 12, color: T.orange }}>↓ Nashra.ai</span>
+            </div>
+
+            <div>
+              <h3 style={{ fontSize: 22, fontWeight: 500, color: T.text1, margin: '0 0 6px' }}>
+                نشرتك البريديّة + مدوّنتك
+              </h3>
+              <h4 style={{ fontSize: 22, fontWeight: 500, color: T.text2, margin: 0 }}>
+                تواصل مع متابعينك مباشرة
+              </h4>
+            </div>
+
+            <a href="#" style={{
+              display: 'inline-flex', alignItems: 'center', gap: 8,
+              background: T.card2, borderRadius: 10,
+              padding: '10px 16px',
+              fontSize: 13, fontWeight: 500, color: T.text1,
+              textDecoration: 'none',
+              border: `1px solid ${T.border}`,
+              alignSelf: 'flex-start',
+              transition: 'background 0.2s',
+            }}>
+              <DotsMenu />
+              <span>الاشتراك والتفاصيل</span>
+            </a>
+
+            {/* Features */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {['تدعم الكتابة بالعربي', 'صفحات هبوط', 'تصميم محمّد الحكيم'].map((feat, i) => (
+                <div key={i} style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 8,
+                  background: 'rgba(255,255,255,0.04)',
+                  border: `1px solid ${T.border}`,
+                  borderRadius: 8, padding: '6px 12px',
+                  alignSelf: 'flex-start',
+                }}>
+                  <Dot color={T.text3} />
+                  <span style={{ fontSize: 13, color: T.text2 }}>{feat}</span>
                 </div>
               ))}
             </div>
-            <a href="#" style={{ display:'inline-block', marginTop:28, fontSize:13, color:'#888', borderBottom:'1px solid rgba(255,255,255,0.1)', paddingBottom:2, transition:'color 0.2s' }}>
-              تصميم محمّد الحكيم →
-            </a>
           </div>
-          {/* Right: newsletter preview */}
+
+          {/* Left col: newsletter mockup */}
           <div style={{
-            background:'linear-gradient(145deg,#1a1a2e,#12121e)',
-            borderRadius:12,
-            padding:'28px 24px',
-            border:'1px solid rgba(255,255,255,0.06)',
+            background: '#0d0d0d',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            padding: 24,
+            borderRight: `1px solid ${T.border}`,
           }}>
-            <div style={{ display:'flex', gap:8, marginBottom:20 }}>
-              {['🟠','🟣','🔵'].map((c,i) => (
-                <span key={i} style={{ padding:'4px 12px', borderRadius:20, background:'rgba(255,255,255,0.06)', fontSize:11, color:'#888' }}>
-                  {c} نشرة {i+1}
-                </span>
-              ))}
-            </div>
-            <div style={{ height:80, background:'rgba(255,255,255,0.03)', borderRadius:8, marginBottom:16 }} />
-            <div style={{ height:12, background:'rgba(255,255,255,0.04)', borderRadius:4, marginBottom:8, width:'80%' }} />
-            <div style={{ height:12, background:'rgba(255,255,255,0.04)', borderRadius:4, marginBottom:16, width:'60%' }} />
-            <div style={{ display:'flex', gap:8 }}>
-              <input placeholder="بريدك الإلكتروني" style={{
-                flex:1, background:'rgba(255,255,255,0.06)', border:'1px solid rgba(255,255,255,0.08)',
-                borderRadius:8, padding:'10px 14px', fontSize:13, color:'#d9d9d9',
-                fontFamily:'inherit', outline:'none', direction:'rtl',
-              }} />
-              <button style={{
-                background:'#2151ff', border:'none', borderRadius:8,
-                padding:'10px 18px', fontSize:13, fontWeight:500, color:'#fff',
-                cursor:'pointer', fontFamily:'inherit', whiteSpace:'nowrap',
-              }}>اشترك</button>
+            <div style={{
+              background: '#111', borderRadius: 12, padding: 20,
+              width: '100%', maxWidth: 280,
+              border: '1px solid rgba(255,255,255,0.1)',
+            }}>
+              <div style={{ display: 'flex', gap: 6, marginBottom: 14 }}>
+                {[T.orangeDim, T.card2, T.card2].map((c, i) => (
+                  <div key={i} style={{ height: 8, flex: i === 0 ? 1 : 2, background: c, borderRadius: 4 }} />
+                ))}
+              </div>
+              <div style={{ background: '#1a1a2e', borderRadius: 8, padding: 12, marginBottom: 10 }}>
+                <div style={{ height: 6, background: '#2e3a6e', borderRadius: 3, width: '70%', marginBottom: 6 }} />
+                <div style={{ height: 6, background: '#2e3a6e', borderRadius: 3, width: '40%' }} />
+              </div>
+              <div style={{
+                background: '#1a1a1a', borderRadius: 6, padding: '8px 10px',
+                fontSize: 11, color: T.muted, marginBottom: 8,
+              }}>Email Address</div>
+              <div style={{
+                background: T.blue, borderRadius: 6, padding: '8px 10px',
+                fontSize: 11, color: '#fff', textAlign: 'center' as const, fontWeight: 500,
+              }}>Join Us →</div>
+              <p style={{ fontSize: 10, color: T.muted, textAlign: 'center' as const, margin: '8px 0 0' }}>
+                Powered by Nashra
+              </p>
+              <div style={{ display: 'flex', gap: 4, justifyContent: 'center', marginTop: 12 }}>
+                {[T.orange, T.muted, T.muted].map((c, i) => (
+                  <div key={i} style={{ width: 6, height: 6, borderRadius: '50%', background: c }} />
+                ))}
+              </div>
             </div>
           </div>
         </div>
       </div>
     </section>
-  )
+  );
 }
 
-/* ══════════════════════════════════════════════════════
-   PRODUCTS CAROUSEL
-══════════════════════════════════════════════════════ */
-function Products() {
-  const [idx, setIdx] = useState(0)
-  const max = products.length - 3
+/* ─── PRODUCTS ──────────────────────────────────── */
+function ProductsSection() {
+  const [idx, setIdx] = useState(0);
+  const cardW = 234;
+  const gap = 12;
+  const visible = 3;
+  const max = products.length - visible;
 
   return (
-    <section style={{ padding:'60px 0' }} dir="rtl">
-      <div className="container">
-        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:28 }}>
-          <div style={{ display:'flex', gap:8 }}>
-            <CarouselBtn dir="right" onClick={() => setIdx(i => Math.max(0,i-1))} disabled={idx===0} />
-            <CarouselBtn dir="left"  onClick={() => setIdx(i => Math.min(max,i+1))} disabled={idx>=max} />
-          </div>
-          <h2 style={{ fontSize:18, fontWeight:400, color:'#ededed' }}>أحدث المنتجات</h2>
-        </div>
-
-        <div style={{ overflow:'hidden' }}>
+    <section style={{ background: T.bg, padding: '60px 0' }}>
+      <div style={{ maxWidth: 1128, margin: '0 auto', padding: '0 24px' }}>
+        <SectionHeading>أحدث المنتجات</SectionHeading>
+        <div style={{ overflow: 'hidden' }}>
           <div style={{
-            display:'flex', gap:16,
-            transform:`translateX(${idx * (33.33+.5)}%)`,
-            transition:'transform 0.4s cubic-bezier(0.4,0,0.2,1)',
+            display: 'flex', gap,
+            transform: `translateX(${idx * (cardW + gap)}px)`,
+            transition: 'transform 0.45s cubic-bezier(0.4,0,0.2,1)',
           }}>
-            {products.map((p,i) => <ProductCard key={i} {...p} />)}
+            {products.map((p, i) => (
+              <div key={i} style={{ flexShrink: 0, width: cardW }}>
+                <a href="#" style={{
+                  display: 'block',
+                  background: T.card, borderRadius: 10,
+                  overflow: 'hidden',
+                  border: `1px solid ${T.border}`,
+                  textDecoration: 'none',
+                  transition: 'border-color 0.2s',
+                }}
+                  onMouseEnter={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.18)')}
+                  onMouseLeave={e => (e.currentTarget.style.borderColor = T.border)}>
+                  <div style={{ height: 140, overflow: 'hidden', position: 'relative' }}>
+                    <Image src={p.img} alt={p.title} width={234} height={140}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  </div>
+                  <div style={{ padding: '10px 12px 14px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                      <span style={{ fontSize: 10, color: T.orange, fontWeight: 500 }}>{p.price}</span>
+                      <span style={{ fontSize: 12, fontWeight: 500, color: T.muted }}>{p.type}</span>
+                    </div>
+                    <p style={{ fontSize: 14, fontWeight: 500, color: T.text1, margin: 0, lineHeight: '20px' }}>{p.title}</p>
+                  </div>
+                </a>
+              </div>
+            ))}
           </div>
         </div>
-      </div>
-    </section>
-  )
-}
 
-function ProductCard({ type, title, price, emoji, bg }: typeof products[0]) {
-  const [hov, setHov] = useState(false)
-  return (
-    <div
-      onMouseEnter={()=>setHov(true)}
-      onMouseLeave={()=>setHov(false)}
-      style={{
-        flexShrink:0,
-        width:'calc(33.33% - 11px)',
-        borderRadius:16,
-        overflow:'hidden',
-        border:'1px solid rgba(255,255,255,0.06)',
-        cursor:'pointer',
-        transform: hov ? 'translateY(-4px)' : 'none',
-        transition:'transform 0.25s ease',
-        background:'#161616',
-      }}
-    >
-      {/* Thumbnail */}
-      <div style={{
-        height:140, background: `linear-gradient(145deg, ${bg} 0%, #0a0a0a 100%)`,
-        display:'flex', alignItems:'center', justifyContent:'center',
-        fontSize:36,
-      }}>{emoji}</div>
-      {/* Info */}
-      <div style={{ padding:'16px 18px 20px' }}>
-        <span style={{
-          fontSize:10, color:'#888', background:'rgba(255,255,255,0.05)',
-          borderRadius:20, padding:'3px 10px', display:'inline-block', marginBottom:10,
-        }}>{type}</span>
-        <p style={{ fontSize:14, color:'#ededed', lineHeight:1.5, marginBottom:14 }}>{title}</p>
-        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
-          <span style={{ fontSize:13, color:'#888', opacity: hov ? 1 : 0.5, transition:'opacity 0.2s' }}>شراء →</span>
-          <span style={{ fontSize:16, fontWeight:600, color:'#ededed' }}>{price}</span>
+        <div style={{ display: 'flex', gap: 8, marginTop: 20, justifyContent: 'flex-end' }}>
+          {[{ arrow: '‹', dir: 1 }, { arrow: '›', dir: -1 }].map(({ arrow, dir }, ai) => (
+            <button key={ai}
+              onClick={() => setIdx(prev => Math.max(0, Math.min(max, prev + dir)))}
+              style={{
+                width: 36, height: 36, borderRadius: '50%',
+                background: 'transparent', border: `1px solid ${T.border}`,
+                color: T.text2, fontSize: 18, cursor: 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+              {arrow}
+            </button>
+          ))}
         </div>
       </div>
-    </div>
-  )
+    </section>
+  );
 }
 
-/* ══════════════════════════════════════════════════════
-   SERVICES PILLS
-══════════════════════════════════════════════════════ */
-function ServicesPills() {
-  const doubled = [...services, ...services]
+/* ─── SERVICES PILLS TICKER ─────────────────────── */
+function ServicesPillsTicker() {
+  const pills = [...servicesPills, ...servicesPills, ...servicesPills];
   return (
-    <section style={{ padding:'32px 0', overflow:'hidden' }} dir="rtl">
-      <div style={{ display:'flex', gap:12, width:'max-content' }} className="scroll-ticker">
-        {doubled.map((s,i) => (
-          <div key={i} style={{
-            padding:'10px 20px', borderRadius:20,
-            border:'1px solid rgba(255,255,255,0.08)',
-            background:'rgba(255,255,255,0.03)',
-            fontSize:13, color:'#d9d9d9', whiteSpace:'nowrap',
-            cursor:'pointer',
-          }}>{s}</div>
-        ))}
+    <section style={{ background: T.bg, padding: '0 0 60px', overflow: 'hidden' }}>
+      <div style={{ display: 'flex', overflow: 'hidden' }}>
+        <div className="scroll-ticker" style={{
+          display: 'flex', gap: 8, flexShrink: 0,
+          alignItems: 'center',
+        }}>
+          {pills.map((pill, i) => (
+            <span key={i} style={{
+              flexShrink: 0,
+              display: 'inline-flex', alignItems: 'center', gap: 6,
+              background: T.orangeDim, borderRadius: 6,
+              padding: '4px 10px',
+              fontSize: 15, color: T.orange,
+              whiteSpace: 'nowrap' as const,
+            }}>
+              <DotsMenu />
+              {pill}
+            </span>
+          ))}
+        </div>
       </div>
     </section>
-  )
+  );
 }
 
-/* ══════════════════════════════════════════════════════
-   ARTICLES — 2 columns
-══════════════════════════════════════════════════════ */
-function Articles() {
-  const ref = useRef<HTMLDivElement>(null)
-  const [vis, setVis] = useState(false)
+/* ─── ARTICLES ──────────────────────────────────── */
+function ArticlesSection() {
+  const [visible, setVisible] = useState(false);
+  const ref = useRef<HTMLElement>(null);
   useEffect(() => {
-    const ob = new IntersectionObserver(([e]) => { if(e.isIntersecting) setVis(true) }, { threshold:0.1 })
-    if(ref.current) ob.observe(ref.current)
-    return () => ob.disconnect()
-  }, [])
-
-  // Split into 2 columns
-  const withThumb  = articles.filter(a => a.thumb)
-  const noThumb    = articles.filter(a => !a.thumb)
+    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) setVisible(true); }, { threshold: 0.05 });
+    if (ref.current) obs.observe(ref.current);
+    return () => obs.disconnect();
+  }, []);
 
   return (
-    <section ref={ref} style={{ padding:'60px 0' }} dir="rtl">
-      <div className="container">
-        {/* Header */}
-        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:32 }}>
-          <div style={{ display:'flex', gap:8 }}>
-            <CarouselBtn dir="right" onClick={()=>{}} disabled={false} />
-            <CarouselBtn dir="left"  onClick={()=>{}} disabled={false} />
-          </div>
-          <h2 style={{ fontSize:18, fontWeight:400, color:'#ededed' }}>آخر المقالات ←</h2>
-        </div>
-
-        {/* 2 column grid */}
-        <div style={{
-          background:'#171717',
-          borderRadius:16,
-          overflow:'hidden',
-          display:'grid',
-          gridTemplateColumns:'1fr 1fr',
-          opacity: vis ? 1 : 0,
-          transform: vis ? 'none' : 'translateY(24px)',
-          transition:'opacity 0.7s, transform 0.7s',
-        }}>
-          {/* RIGHT column: with thumbs */}
-          <div style={{ borderLeft:'1px solid rgba(255,255,255,0.05)' }}>
-            {withThumb.map((a,i) => (
-              <ArticleRow key={i} title={a.title} thumb={a.thumb} border={i>0} />
-            ))}
-          </div>
-          {/* LEFT column: text only */}
-          <div>
-            {noThumb.map((a,i) => (
-              <ArticleRow key={i} title={a.title} thumb="" border={i>0} />
-            ))}
-          </div>
+    <section ref={ref} style={{ background: T.bg, padding: '60px 0' }}>
+      <div style={{ maxWidth: 1128, margin: '0 auto', padding: '0 24px' }}>
+        <SectionHeading>آخر المقالات</SectionHeading>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
+          {articles.map((art, i) => (
+            <a key={i} href="#" style={{
+              display: 'flex', alignItems: 'center',
+              justifyContent: 'space-between', gap: 12,
+              padding: '16px 0',
+              borderBottom: `1px solid ${T.border}`,
+              ...(i % 2 === 0
+                ? { borderLeft: `1px solid ${T.border}`, paddingRight: 16 }
+                : { paddingLeft: 16 }),
+              textDecoration: 'none',
+              opacity: visible ? 1 : 0,
+              transform: visible ? 'translateY(0)' : 'translateY(14px)',
+              transition: `opacity 0.5s ease ${i * 0.05}s, transform 0.5s ease ${i * 0.05}s`,
+            }}>
+              <p style={{ fontSize: 14, color: T.text2, margin: 0, lineHeight: '22px', flex: 1 }}>{art.title}</p>
+              {art.hasThumb && art.img && (
+                <div style={{ width: 48, height: 48, borderRadius: 8, overflow: 'hidden', flexShrink: 0 }}>
+                  <Image src={art.img} alt="" width={48} height={48}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                </div>
+              )}
+            </a>
+          ))}
         </div>
       </div>
     </section>
-  )
+  );
 }
 
-function ArticleRow({ title, thumb, border }: { title:string; thumb:string; border:boolean }) {
-  const [hov, setHov] = useState(false)
-  return (
-    <div
-      onMouseEnter={()=>setHov(true)}
-      onMouseLeave={()=>setHov(false)}
-      style={{
-        display:'flex', alignItems:'center', justifyContent:'space-between',
-        padding:'20px 24px',
-        borderTop: border ? '1px solid rgba(255,255,255,0.05)' : 'none',
-        gap:16,
-        cursor:'pointer',
-        background: hov ? 'rgba(255,255,255,0.02)' : 'transparent',
-        transition:'background 0.2s',
-      }}
-    >
-      <p style={{ fontSize:14, color:'#d9d9d9', lineHeight:1.5, flex:1 }}>{title}</p>
-      {thumb && (
-        <div style={{
-          width:48, height:48, borderRadius:8, flexShrink:0,
-          background:'rgba(255,255,255,0.06)',
-          display:'flex', alignItems:'center', justifyContent:'center',
-          fontSize:20,
-        }}>{thumb}</div>
-      )}
-    </div>
-  )
-}
+/* ─── VIDEO SECTION ─────────────────────────────── */
+const videos = [
+  { title: 'يعمل لمدة ٣ ساعات بدخل 80 الف ريال', channel: 'محمد رشاد الحكيم', tag: 'مختلف', img: '/images/portfolio-hamad.png' },
+  { title: 'بودكاست بالي مع محمد الحكيم', channel: 'محمد الحكيم', tag: '', img: '/images/portfolio-treehaus.png' },
+];
 
-/* ══════════════════════════════════════════════════════
-   PODCAST / VIDEO
-══════════════════════════════════════════════════════ */
-function Podcast() {
+function VideoSection() {
   return (
-    <section style={{ padding:'40px 0' }} dir="rtl">
-      <div className="container">
-        <div style={{
-          background:'#171717', borderRadius:16,
-          padding:'36px 40px',
-          display:'flex', alignItems:'center', justifyContent:'space-between',
-          flexWrap:'wrap', gap:24,
-        }}>
-          <div>
-            <span style={{ fontSize:12, color:'rgba(255,255,255,0.25)', letterSpacing:1, display:'block', marginBottom:8 }}>البودكاست</span>
-            <h3 style={{ fontSize:'clamp(18px,2vw,26px)', fontWeight:500, color:'#ededed', marginBottom:4 }}>
-              استمع للبودكاست
-            </h3>
-            <p style={{ fontSize:14, color:'#888' }}>حلقات أسبوعيّة في بيع الخبرات والأعمال</p>
-          </div>
-          <div style={{ display:'flex', gap:10, flexWrap:'wrap' }}>
-            {[
-              { label:'YouTube', color:'#ff0000', icon:'▶' },
-              { label:'Spotify', color:'#1DB954', icon:'♪' },
-              { label:'Apple',   color:'#fc3c44', icon:'🎙' },
-            ].map(p => (
-              <a key={p.label} href="#" style={{
-                display:'flex', alignItems:'center', gap:6,
-                padding:'8px 16px', borderRadius:20,
-                border:`1px solid ${p.color}33`,
-                background:`${p.color}11`,
-                fontSize:13, color:'#ededed',
-                transition:'background 0.2s',
-              }}
-              onMouseEnter={e=>e.currentTarget.style.background=`${p.color}22`}
-              onMouseLeave={e=>e.currentTarget.style.background=`${p.color}11`}
-              >
-                <span style={{ color:p.color }}>{p.icon}</span>
-                {p.label}
-              </a>
-            ))}
-          </div>
+    <section style={{ background: T.bg, padding: '60px 0' }}>
+      <div style={{ maxWidth: 1128, margin: '0 auto', padding: '0 24px' }}>
+        <SectionHeading>محتوى ومُقابلات</SectionHeading>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+          {videos.map((v, i) => (
+            <a key={i} href="#" target="_blank" rel="noopener noreferrer"
+              style={{ display: 'block', borderRadius: 12, overflow: 'hidden', textDecoration: 'none', position: 'relative' as const }}>
+              <div style={{ position: 'relative' as const, paddingBottom: '62%', background: T.card }}>
+                <Image src={v.img} alt={v.title} fill style={{ objectFit: 'cover' }} />
+                <div style={{
+                  position: 'absolute' as const, inset: 0,
+                  background: 'linear-gradient(to top, rgba(0,0,0,0.75) 0%, transparent 60%)',
+                }} />
+                {/* Play btn */}
+                <div style={{
+                  position: 'absolute' as const, top: '50%', left: '50%',
+                  transform: 'translate(-50%,-50%)',
+                  width: 50, height: 50, borderRadius: '50%',
+                  background: 'rgba(0,0,0,0.65)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                  <span style={{ color: '#fff', fontSize: 20 }}>▶</span>
+                </div>
+                {v.tag && (
+                  <div style={{
+                    position: 'absolute' as const, top: 12, right: 12,
+                    background: T.orange, borderRadius: 6,
+                    padding: '2px 8px', fontSize: 11, color: '#fff', fontWeight: 500,
+                  }}>{v.tag}</div>
+                )}
+                <div style={{ position: 'absolute' as const, bottom: 12, right: 12, left: 12 }}>
+                  <p style={{ fontSize: 13, color: '#fff', margin: '0 0 2px', fontWeight: 500 }}>{v.title}</p>
+                  <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.55)', margin: 0 }}>{v.channel}</p>
+                </div>
+              </div>
+            </a>
+          ))}
         </div>
       </div>
     </section>
-  )
+  );
 }
 
-/* ══════════════════════════════════════════════════════
-   CTA SECTION — "تبحث عن خدماتي؟"
-══════════════════════════════════════════════════════ */
+/* ─── CTA SECTION ───────────────────────────────── */
 function CTASection() {
   return (
-    <section style={{ padding:'40px 0' }} dir="rtl">
-      <div className="container">
+    <section style={{ background: T.bg, padding: '60px 0' }}>
+      <div style={{ maxWidth: 1128, margin: '0 auto', padding: '0 24px' }}>
         <div style={{
-          background:'#171717', borderRadius:16,
-          padding:'44px 48px',
-          textAlign:'right',
+          background: T.card, borderRadius: 12, padding: 40,
+          maxWidth: 800,
         }}>
-          <h2 style={{ fontSize:'clamp(22px,2.5vw,36px)', fontWeight:500, color:'#ededed', marginBottom:16 }}>
+          <h2 style={{ fontSize: 22, fontWeight: 500, color: T.text1, margin: '0 0 12px' }}>
             تبحث عن خدماتي؟
           </h2>
-          <p style={{ fontSize:15, color:'#888', lineHeight:1.8, marginBottom:32, maxWidth:560 }}>
-            ومستعد أن تستثمر فيه وتعمل مع الأفضل؟ فرق شاسع ما بين بناء المشروع مع مرشد خبير وبين العمل وحدك
+          <p style={{ fontSize: 16, color: T.text3, lineHeight: '28px', margin: '0 0 28px', maxWidth: 560 }}>
+            ومستعد أن تستثمر فيه وتعمل مع الأفضل؟ فرق شاسع ما بين بناء المشروع الاستشاري والتعامل معه كهواية. المشروع يتطلّب رؤية، تركيز وخطّة واضحة في التسويق والمُنتجات. يمكنك أن تعمل مع ٥٠٠ خبير في العالم العربي لتحصل على خبرتي أو يمكنك أن تحصل عليها مباشرة بالضغط على الزر أدناه.
           </p>
-          <div style={{ display:'flex', gap:12, flexWrap:'wrap' }}>
+          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' as const }}>
             <a href="#" style={{
-              padding:'12px 28px', borderRadius:20,
-              background:'rgba(255,255,255,0.06)', border:'1px solid rgba(255,255,255,0.1)',
-              fontSize:14, color:'#ededed', transition:'background 0.2s',
-            }}>تواصل معي</a>
+              display: 'inline-flex', alignItems: 'center', gap: 8,
+              background: T.text1, color: T.bg,
+              borderRadius: 10, padding: '10px 18px',
+              fontSize: 13, fontWeight: 500, textDecoration: 'none',
+            }}>
+              <DotsMenu />
+              <span>الخدمات والباقات</span>
+            </a>
             <a href="#" style={{
-              padding:'12px 28px', borderRadius:20,
-              background:'rgba(255,255,255,0.06)', border:'1px solid rgba(255,255,255,0.1)',
-              fontSize:14, color:'#ededed', transition:'background 0.2s',
-            }}>الخدمات والباقات</a>
-            <a href="#" style={{
-              padding:'12px 28px', borderRadius:20,
-              background:'rgba(255,255,255,0.06)', border:'1px solid rgba(255,255,255,0.1)',
-              fontSize:14, color:'#ededed', transition:'background 0.2s',
-            }}>جميع الحلقات</a>
+              display: 'inline-flex', alignItems: 'center', gap: 8,
+              background: 'transparent', color: T.text2,
+              border: `1px solid ${T.border}`, borderRadius: 10,
+              padding: '10px 18px',
+              fontSize: 13, fontWeight: 500, textDecoration: 'none',
+            }}>
+              <DotsMenu />
+              <span>تواصل معي</span>
+            </a>
           </div>
         </div>
       </div>
     </section>
-  )
+  );
 }
 
-/* ══════════════════════════════════════════════════════
-   FOOTER / NEWSLETTER
-══════════════════════════════════════════════════════ */
-function Footer() {
+/* ─── PODCAST SECTION ───────────────────────────── */
+function PodcastSection() {
   return (
-    <footer style={{ paddingTop:40, paddingBottom:48 }} dir="rtl">
-      <div className="container">
+    <section style={{ background: T.bg, padding: '60px 0' }}>
+      <div style={{ maxWidth: 1128, margin: '0 auto', padding: '0 24px' }}>
+        <SectionHeading leftBtn={
+          <a href="#" style={{
+            display: 'inline-flex', alignItems: 'center', gap: 8,
+            background: 'transparent', color: T.text2,
+            border: `1px solid ${T.border}`, borderRadius: 10,
+            padding: '8px 14px',
+            fontSize: 13, textDecoration: 'none',
+          }}>
+            <DotsMenu /><span>جميع الحلقات</span>
+          </a>
+        }>
+          تعلّم بيع الخبرات
+        </SectionHeading>
+
+        {/* Podcast card */}
+        <div style={{
+          background: T.card, borderRadius: 12,
+          padding: '20px 24px',
+          display: 'flex', alignItems: 'center', gap: 16,
+          maxWidth: 560,
+          border: `1px solid ${T.border}`,
+        }}>
+          <div style={{ width: 64, height: 64, borderRadius: 10, overflow: 'hidden', flexShrink: 0 }}>
+            <Image src="/images/avatar.png" alt="بودكاست حكيم" width={64} height={64}
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          </div>
+          <div style={{ flex: 1 }}>
+            <p style={{ fontSize: 18, fontWeight: 500, color: T.text1, margin: '0 0 4px' }}>بودكاست حكيم</p>
+            <p style={{ fontSize: 12, color: T.muted, margin: '0 0 12px' }}>محمّد الحكيم · ابني مشروعك الاستشاري وبيع الخبرة بدل الخدمة</p>
+            <div style={{ display: 'flex', gap: 6 }}>
+              {[
+                { label: 'YouTube', color: '#ff0000' },
+                { label: 'Spotify', color: '#1db954' },
+                { label: 'Apple', color: '#9b59b6' },
+              ].map(({ label, color }) => (
+                <a key={label} href="#" style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 4,
+                  background: `${color}22`,
+                  border: `1px solid ${color}44`,
+                  borderRadius: 6, padding: '3px 9px',
+                  fontSize: 11, color, textDecoration: 'none',
+                }}>
+                  {label}
+                </a>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ─── FOOTER ────────────────────────────────────── */
+function Footer() {
+  const [email, setEmail] = useState('');
+  return (
+    <footer style={{ background: T.bg, padding: '60px 0 40px', borderTop: `1px solid ${T.border}` }}>
+      <div style={{ maxWidth: 1128, margin: '0 auto', padding: '0 24px' }}>
         {/* Newsletter */}
-        <div style={{ marginBottom:48, textAlign:'right' }}>
-          <h3 style={{ fontSize:'clamp(20px,2vw,28px)', fontWeight:500, color:'#ededed', lineHeight:1.4, marginBottom:28 }}>
-            أحدث مقالاتي<br />مباشرة في بريدك الالكتروني
-          </h3>
-          <div style={{ display:'flex', gap:10, maxWidth:480 }}>
-            <button style={{
-              background:'#2151ff', border:'none', borderRadius:10,
-              padding:'12px 24px', fontSize:14, fontWeight:500,
-              color:'#fff', cursor:'pointer', fontFamily:'inherit', flexShrink:0,
-            }}>اشترك</button>
+        <div style={{ marginBottom: 48 }}>
+          <p style={{ fontSize: 18, fontWeight: 500, color: T.text1, margin: '0 0 20px', lineHeight: '28px' }}>
+            أحدث مقالاتي مباشرة في بريدك الالكتروني
+          </p>
+          <div style={{
+            display: 'flex', maxWidth: 480,
+            borderRadius: 10, overflow: 'hidden',
+            border: `1px solid ${T.border}`,
+          }}>
             <input
               type="email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
               placeholder="hala@moedesigns.io"
               style={{
-                flex:1, background:'rgba(255,255,255,0.05)',
-                border:'1px solid rgba(255,255,255,0.08)',
-                borderRadius:10, padding:'12px 16px',
-                fontSize:14, color:'#d9d9d9',
-                fontFamily:'inherit', outline:'none', direction:'rtl',
+                flex: 1, padding: '12px 16px',
+                background: T.card, border: 'none', outline: 'none',
+                fontSize: 14, color: T.text1,
+                fontFamily: 'inherit', direction: 'rtl' as const,
               }}
             />
+            <button style={{
+              padding: '12px 20px',
+              background: T.blue, border: 'none',
+              fontSize: 14, fontWeight: 500, color: '#fff',
+              cursor: 'pointer', flexShrink: 0, fontFamily: 'inherit',
+            }}>
+              اشترك
+            </button>
           </div>
         </div>
 
-        {/* Bottom bar */}
-        <div style={{
-          borderTop:'1px solid rgba(255,255,255,0.06)',
-          paddingTop:24,
-          display:'flex', alignItems:'center', justifyContent:'center', flexWrap:'wrap',
-          gap:8, fontSize:14, color:'rgba(255,255,255,0.25)',
-        }}>
-          {['Bali / Dubai','hala@moedesigns.io','نشرة','احجز استشارة 💤'].map((item, i, arr) => (
-            <span key={item} style={{ display:'flex', alignItems:'center', gap:8 }}>
-              <a href="#" style={{ color:'rgba(255,255,255,0.25)', transition:'color 0.2s' }}
-              onMouseEnter={e=>e.currentTarget.style.color='rgba(255,255,255,0.6)'}
-              onMouseLeave={e=>e.currentTarget.style.color='rgba(255,255,255,0.25)'}
-              >{item}</a>
-              {i < arr.length-1 && <span>·</span>}
+        {/* Footer links */}
+        <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap' as const }}>
+          {[
+            'Bali / Dubai', 'hala@moedesigns.io', 'نشــرة', 'احجز استشارة 💤',
+          ].map((item, i, arr) => (
+            <span key={i} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <a href="#" style={{ fontSize: 13, color: T.muted, textDecoration: 'none', transition: 'color 0.2s' }}
+                onMouseEnter={e => (e.currentTarget.style.color = T.text2)}
+                onMouseLeave={e => (e.currentTarget.style.color = T.muted)}>
+                {item}
+              </a>
+              {i < arr.length - 1 && (
+                <span style={{ color: 'rgba(255,255,255,0.2)', fontSize: 14 }}>·</span>
+              )}
             </span>
           ))}
         </div>
       </div>
     </footer>
-  )
+  );
 }
 
-/* ══════════════════════════════════════════════════════
-   PAGE
-══════════════════════════════════════════════════════ */
+/* ─── PAGE ROOT ─────────────────────────────────── */
 export default function Page() {
   return (
-    <div style={{ background:'#0f0f0f', minHeight:'100vh' }} dir="rtl">
+    <div style={{ background: T.bg, minHeight: '100vh' }}>
       <Navbar />
-      <Hero />
-      <Portfolio />
-      <Stats />
-      <Clients />
-      <NashraSection />
-      <Products />
-      <ServicesPills />
-      <Articles />
-      <Podcast />
-      <CTASection />
-      <Footer />
+      <main>
+        <HeroSection />
+        <PortfolioSection />
+        <StatsSection />
+        <ClientsTicker />
+        <NashraSection />
+        <ProductsSection />
+        <ServicesPillsTicker />
+        <ArticlesSection />
+        <VideoSection />
+        <CTASection />
+        <PodcastSection />
+        <Footer />
+      </main>
     </div>
-  )
+  );
 }
